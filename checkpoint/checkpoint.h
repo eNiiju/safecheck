@@ -6,6 +6,13 @@
  *
 */
 
+#include "configuration.h"
+#include "display.h"
+#include "kineis.h"
+#include "log.h"
+#include "rfid.h"
+#include "usb_key.h"
+
 /* ------------------------------------------------------------------------- */
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
