@@ -17,6 +17,10 @@
 #define MAX_CHECKPOINTS 64
 #define MAX_NAME_LENGTH 256
 #define MAX_PARTICIPANTS 351
+#define ORDER_SECTION_START "[order]"
+#define PARTICIPANTS_SECTION_START "[participants]"
+#define READ_STATE_ORDER 1
+#define READ_STATE_PARTICIPANTS 2
 
 /* ------------------------------------------------------------------------- */
 /*                             Type definitions                              */
@@ -35,9 +39,21 @@ struct participant {
 */
 struct configuration {
     int order[MAX_CHECKPOINTS];
+    int nb_checkpoints;
     struct participant participants[MAX_PARTICIPANTS];
+    int nb_participants;
 };
 
 typedef struct configuration conf_t;
+
+/* ------------------------------------------------------------------------- */
+/*                            Function prototypes                            */
+/* ------------------------------------------------------------------------- */
+
+/**
+ * Read the configuration file and return a configuration structure.
+ * @param path_to_configuration_file Path to the configuration file.
+*/
+conf_t read_configuration(char* path_to_configuration_file);
 
 #endif
