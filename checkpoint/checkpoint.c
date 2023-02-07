@@ -4,7 +4,7 @@
  * @author Noé Maillet & Mathéo Mercier
  * @date 2023-02-07
  *
-*/
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
