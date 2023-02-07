@@ -56,7 +56,7 @@ conf_t read_configuration(char* path_to_configuration_file)
         else if (read_state == READ_STATE_PARTICIPANTS) {
             char* token = strtok(line, " ");
             conf.participants[conf.nb_participants].id = atoi(token);
-            token = strtok(NULL, "\n");
+            token = strtok(NULL, "\"");
             strcpy(conf.participants[conf.nb_participants].name, token);
             conf.nb_participants++;
         }
