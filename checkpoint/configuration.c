@@ -12,15 +12,25 @@
 #include "configuration.h"
 
 /* ------------------------------------------------------------------------- */
+/*                              Macro functions                              */
+/* ------------------------------------------------------------------------- */
+
+#define IS_NUMBER(n, s) !(n == 0 && strncmp(s, "0", 1) != 0)
+
+/* ------------------------------------------------------------------------- */
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
 
-conf_t read_configuration(char* path_to_configuration_file)
+bool read_configuration(conf_t* configuration, char* path_to_configuration_file)
 {
-    conf_t conf = {
+    // Reset the configuration struct
+    *configuration = (conf_t) {
         .nb_checkpoints = 0,
-        .nb_participants = 0
+        .nb_participants = 0,
+        .order = {},
+        .participants = {}
     };
+
     FILE* fp;
     int read_state = 0; // 0, READ_STATE_ORDER or READ_STATE_PARTICIPANTS
     char* line;
@@ -28,7 +38,7 @@ conf_t read_configuration(char* path_to_configuration_file)
     ssize_t read_size;
 
     fp = fopen(path_to_configuration_file, "r");
-    if (fp == NULL) exit(EXIT_FAILURE);
+    if (fp == NULL) return false;
 
     while ((read_size = getline(&line, &n, fp)) != -1) {
         // After this line, we are reading the order
@@ -49,21 +59,35 @@ conf_t read_configuration(char* path_to_configuration_file)
 
         // Read the checkpoint
         if (read_state == READ_STATE_ORDER) {
-            conf.order[conf.nb_checkpoints] = atoi(line);
-            conf.nb_checkpoints++;
+            int parsed = atoi(line);
+            if (!IS_NUMBER(parsed, line)) continue;
+            configuration->order[configuration->nb_checkpoints] = parsed;
+            configuration->nb_checkpoints++;
         }
         // Read the participant
         else if (read_state == READ_STATE_PARTICIPANTS) {
+            int id;
+            char name[MAX_NAME_LENGTH];
+
+            // Get the id
             char* token = strtok(line, " ");
-            conf.participants[conf.nb_participants].id = atoi(token);
+            id = atoi(token);
+            if (token == NULL || !IS_NUMBER(id, token)) continue;
+
+            // Get the name
             token = strtok(NULL, "\"");
-            strcpy(conf.participants[conf.nb_participants].name, token);
-            conf.nb_participants++;
+            if (token == NULL) continue;
+            strncpy(name, token, MAX_NAME_LENGTH);
+
+            // Add the participant to the array
+            configuration->participants[configuration->nb_participants].id = id;
+            strcpy(configuration->participants[configuration->nb_participants].name, name);
+            configuration->nb_participants++;
         }
     }
 
     fclose(fp);
     if (line) free(line);
 
-    return conf;
+    return true;
 }

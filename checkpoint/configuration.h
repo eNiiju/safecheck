@@ -9,6 +9,8 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
+#include <stdbool.h>
+
 /* ------------------------------------------------------------------------- */
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
@@ -51,9 +53,11 @@ typedef struct configuration conf_t;
 /* ------------------------------------------------------------------------- */
 
 /**
- * Read the configuration file and return a configuration structure.
+ * Read the configuration file and store the data in a configuration structure.
+ * @param configuration Pointer to the configuration structure.
  * @param path_to_configuration_file Path to the configuration file.
+ * @return True if the configuration file was read successfully, false otherwise.
 */
-conf_t read_configuration(char* path_to_configuration_file);
+bool read_configuration(conf_t* configuration, char* path_to_configuration_file);
 
 #endif
