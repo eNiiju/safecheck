@@ -10,6 +10,7 @@
 #define LOG_H
 
 #include <time.h>
+#include <stdbool.h>
 
 /* ------------------------------------------------------------------------- */
 /*                          Constants & Definitions                          */
@@ -17,8 +18,10 @@
 
 #define PATH_LOG "./resources/safecheck.log"
 #define MAX_LENGTH_DESCRIPTION 256
-#define ID_EMERGENCY -1
-#define ID_EMERGENCY_SOLVED -2
+#define EMERGENCY_ID -1
+#define EMERGENCY_SOLVED_ID -2
+#define EMERGENCY_DESCRIPTION "Emergency button pressed"
+#define EMERGENCY_SOLVED_DESCRIPTION "Emergency solved"
 
 /* ------------------------------------------------------------------------- */
 /*                             Type definitions                              */
@@ -34,5 +37,15 @@ struct log {
 };
 
 typedef struct log log_t;
+
+/* ------------------------------------------------------------------------- */
+/*                            Function prototypes                            */
+/* ------------------------------------------------------------------------- */
+
+bool create_log(int id, char* description);
+
+bool create_emergency_log(void);
+
+bool create_emergency_solved_log(void);
 
 #endif
