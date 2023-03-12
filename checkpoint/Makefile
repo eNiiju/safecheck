@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Wno-unused-parameter
-LDFLAGS=-lpthread
+LDFLAGS=-lpthread -ludev
 
 all: checkpoint
 

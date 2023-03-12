@@ -73,5 +73,7 @@ void* usb_key_routine(void* arg)
 {
     printf("USB key routine\n");
 
+    wait_usb_connection();
+
     pthread_exit(NULL);
 }

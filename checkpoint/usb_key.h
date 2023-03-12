@@ -13,6 +13,6 @@
 /*                            Function prototypes                            */
 /* ------------------------------------------------------------------------- */
 
-
+void wait_usb_connection(void);
 
 #endif
