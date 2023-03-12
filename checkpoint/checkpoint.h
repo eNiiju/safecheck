@@ -14,15 +14,6 @@
 #include "usb_key.h"
 
 /* ------------------------------------------------------------------------- */
-/*                          Constants & Definitions                          */
-/* ------------------------------------------------------------------------- */
-
-#define RFID_CODE_PARTICIPANT_RANGE_START 0
-#define RFID_CODE_PARTICIPANT_RANGE_END 10000
-#define RFID_CODE_RESOLVE_EMERGENCY 10001
-#define RFID_CODE_RESET 10002
-
-/* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */
 /* ------------------------------------------------------------------------- */
 
