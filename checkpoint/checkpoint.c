@@ -11,6 +11,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <errno.h>
+#include <dirent.h>
+#include <sys/mount.h>
+#include <sys/stat.h>
 
 /* ------------------------------------------------------------------------- */
 /*                               Main function                               */
@@ -19,6 +23,8 @@
 int main(int argc, char* argv[])
 {
     pthread_t th_display, th_button, th_rfid, th_send_data, th_usb_key;
+
+    if (!init()) return -1;
 
     // Create threads
     pthread_create(&th_display, NULL, display_routine, NULL);
@@ -40,6 +46,18 @@ int main(int argc, char* argv[])
 /* ------------------------------------------------------------------------- */
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
+
+bool init(void)
+{
+    // Create usb mount path directory if it doesn't exist
+    opendir(USB_MOUNT_PATH);
+    if (errno == ENOENT && mkdir(USB_MOUNT_PATH, 0777) != 0) {
+        perror("Can't create usb mount path directory");
+        return false;
+    }
+
+    return true;
+}
 
 void* display_routine(void* arg)
 {
@@ -72,6 +90,14 @@ void* usb_key_routine(void* arg)
         switch (usb_event.event) {
         case USB_EVENT_CONNECT:
             printf("Device connected: %s\n", usb_event.device);
+
+            // Mount device to defined path
+            if (mount(usb_event.device, USB_MOUNT_PATH, "vfat", 0, NULL) != 0) {
+                perror("mount failed");
+                break;
+            }
+
+            printf("%s was mounted successfully.\n", usb_event.device);
             break;
         case USB_EVENT_DISCONNECT:
             printf("Device disconnected: %s\n", usb_event.device);

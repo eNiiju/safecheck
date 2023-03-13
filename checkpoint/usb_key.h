@@ -18,7 +18,7 @@
 #define MAX_DEVICES 10
 #define MAX_DEVICE_NAME_LENGTH 10
 #define MAX_TRIES_FIND_DEVICE 10
-#define MOUNT_PATH "/mnt/safecheck"
+#define USB_MOUNT_PATH "/mnt/safecheck"
 #define USB_EVENT_CONNECT 1
 #define USB_EVENT_DISCONNECT 2
 
@@ -26,6 +26,10 @@
 /*                             Type definitions                              */
 /* ------------------------------------------------------------------------- */
 
+/**
+ * Structure representing a USB event, including the type of event (connection
+ * or disconnection of the USB drive) and the name of the device (example: /dev/sda1)
+*/
 struct usb_event {
     int event; // USB_EVENT_CONNECT || USB_EVENT_CONNECT
     char device[MAX_DEVICE_NAME_LENGTH + 1];

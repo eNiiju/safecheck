@@ -13,9 +13,17 @@
 #include "rfid.h"
 #include "usb_key.h"
 
+#include <stdbool.h>
+
 /* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */
 /* ------------------------------------------------------------------------- */
+
+/**
+ * Initialization function. Prints error if they happen.
+ * @return True if initialization was successful, false otherwise.
+*/
+bool init(void);
 
 /**
  * Function for the display thread.

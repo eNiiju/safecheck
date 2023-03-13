@@ -12,12 +12,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <libudev.h>
-#include <sys/mount.h>
 
 /* ------------------------------------------------------------------------- */
 /*                             Global variables                              */
 /* ------------------------------------------------------------------------- */
 
+// Variables to store the device list (and length) for comparison when we add/remove a device
 char devices[MAX_DEVICES][MAX_DEVICE_NAME_LENGTH + 1];
 int nb_devices;
 
