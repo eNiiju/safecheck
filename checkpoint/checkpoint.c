@@ -101,11 +101,16 @@ void* usb_key_routine(void* arg)
             printf("%s was mounted successfully.\n", usb_event.device);
 
             // If there is a configuration file, copy it locally
-            if (access(CONFIG_FILE_NAME, F_OK) == 0) {
+            char path_to_config[30];
+            strcpy(path_to_config, USB_MOUNT_PATH);
+            strcat(path_to_config, "/");
+            strcat(path_to_config, CONFIG_FILE_NAME);
+            if (access(path_to_config, F_OK) == 0) {
                 // Retrieve configuration
                 // todo and make it check if it's a valid one?
 
                 // Write configuration
+                
             }
 
             break;
