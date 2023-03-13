@@ -16,7 +16,8 @@
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
 
-#define PATH_LOG "./resources/safecheck.log"
+#define LOG_FILE_NAME "safecheck.log"
+#define PATH_LOG "/var/log/safecheck/safecheck.log"
 #define MAX_LENGTH_DESCRIPTION 256
 #define MAX_LENGTH_LINE 10 /* timestamp */ + 11 /* id */ + 2 /* quotes */ + MAX_LENGTH_DESCRIPTION + 3 /* spaces & newline */
 #define EMERGENCY_ID -1

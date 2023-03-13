@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
 #include <dirent.h>
@@ -98,6 +99,15 @@ void* usb_key_routine(void* arg)
             }
 
             printf("%s was mounted successfully.\n", usb_event.device);
+
+            // If there is a configuration file, copy it locally
+            if (access(CONFIG_FILE_NAME, F_OK) == 0) {
+                // Retrieve configuration
+                // todo and make it check if it's a valid one?
+
+                // Write configuration
+            }
+
             break;
         case USB_EVENT_DISCONNECT:
             printf("Device disconnected: %s\n", usb_event.device);

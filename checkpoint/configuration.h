@@ -15,7 +15,8 @@
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
 
-#define PATH_CONFIG "./resources/safecheck.conf"
+#define CONFIG_FILE_NAME "safecheck.conf"
+#define PATH_CONFIG "/etc/safecheck.conf"
 #define MAX_CHECKPOINTS 64
 #define MAX_NAME_LENGTH 256
 #define MAX_PARTICIPANTS 351
