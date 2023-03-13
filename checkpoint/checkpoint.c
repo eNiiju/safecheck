@@ -43,37 +43,41 @@ int main(int argc, char* argv[])
 
 void* display_routine(void* arg)
 {
-    printf("Display routine\n");
-
     pthread_exit(NULL);
 }
 
 void* button_routine(void* arg)
 {
-    printf("Button routine\n");
-
     pthread_exit(NULL);
 }
 
 void* rfid_routine(void* arg)
 {
-    printf("RFID routine\n");
-
     pthread_exit(NULL);
 }
 
 void* send_data_routine(void* arg)
 {
-    printf("Send data routine\n");
-
     pthread_exit(NULL);
 }
 
 void* usb_key_routine(void* arg)
 {
-    printf("USB key routine\n");
+    usb_event_t usb_event;
 
-    wait_usb_connection();
+    while (1) {
+        if (!wait_usb_event(&usb_event)) continue;
+
+        // A usb device event has occured
+        switch (usb_event.event) {
+        case USB_EVENT_CONNECT:
+            printf("Device connected: %s", usb_event.device);
+            break;
+        case USB_EVENT_DISCONNECT:
+            printf("Device disconnected: %s", usb_event.device);
+            break;
+        }
+    }
 
     pthread_exit(NULL);
 }
