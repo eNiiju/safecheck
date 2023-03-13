@@ -71,10 +71,10 @@ void* usb_key_routine(void* arg)
         // A usb device event has occured
         switch (usb_event.event) {
         case USB_EVENT_CONNECT:
-            printf("Device connected: %s", usb_event.device);
+            printf("Device connected: %s\n", usb_event.device);
             break;
         case USB_EVENT_DISCONNECT:
-            printf("Device disconnected: %s", usb_event.device);
+            printf("Device disconnected: %s\n", usb_event.device);
             break;
         }
     }

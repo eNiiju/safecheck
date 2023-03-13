@@ -45,51 +45,51 @@ bool wait_usb_event(usb_event_t* usb_event)
     udev_monitor_filter_add_match_subsystem_devtype(mon, "usb", "usb_device");
     udev_monitor_enable_receiving(mon);
 
-    while (1) {
-        // Retrieve current device list, for future comparison
-        nb_devices = retrieve_usb_devices(devices);
+    // Retrieve current device list, for future comparison
+    nb_devices = retrieve_usb_devices(devices);
 
-        // Wait for device event
+    while (1) {
+        // See if device event has occured
         struct udev_device* dev = udev_monitor_receive_device(mon);
 
-        if (dev) {
-            const char* action = udev_device_get_action(dev);
+        if (!dev) continue;
 
-            if (action && !strcmp(action, "add")) {
-                // Device connection
-                char device[MAX_DEVICE_NAME_LENGTH + 1];
-                bool found = false;
-                for (int i = 0; i < MAX_TRIES_FIND_DEVICE && !found; i++) {
-                    sleep(1);
-                    found = find_added_usb_device(device);
-                }
+        const char* action = udev_device_get_action(dev);
 
-                if (!found) continue;
-
-                // Found the added usb device !
-                usb_event->event = USB_EVENT_CONNECT;
-                strncpy(usb_event->device, device, MAX_DEVICE_NAME_LENGTH);
-                return true;
-            }
-            else if (action && !strcmp(action, "remove")) {
-                // Device disconnection
-                char device[MAX_DEVICE_NAME_LENGTH + 1];
-                bool found = false;
-                for (int i = 0; i < MAX_TRIES_FIND_DEVICE && !found; i++) {
-                    sleep(1);
-                    found = find_removed_usb_device(device);
-                }
-
-                if (!found) continue;
-
-                // Found the removed usb device !
-                usb_event->event = USB_EVENT_DISCONNECT;
-                strncpy(usb_event->device, device, MAX_DEVICE_NAME_LENGTH);
-                return true;
+        // Device connection event
+        if (action && !strcmp(action, "add")) {
+            char device[MAX_DEVICE_NAME_LENGTH + 1];
+            bool found = false;
+            for (int i = 0; i < MAX_TRIES_FIND_DEVICE && !found; i++) {
+                sleep(1);
+                found = find_added_usb_device(device);
             }
 
-            udev_device_unref(dev);
+            if (!found) continue;
+
+            // Found the added usb device !
+            usb_event->event = USB_EVENT_CONNECT;
+            strncpy(usb_event->device, device, MAX_DEVICE_NAME_LENGTH);
+            return true;
         }
+        // Device disconnection event
+        else if (action && !strcmp(action, "remove")) {
+            char device[MAX_DEVICE_NAME_LENGTH + 1];
+            bool found = false;
+            for (int i = 0; i < MAX_TRIES_FIND_DEVICE && !found; i++) {
+                sleep(1);
+                found = find_removed_usb_device(device);
+            }
+
+            if (!found) continue;
+
+            // Found the removed usb device !
+            usb_event->event = USB_EVENT_DISCONNECT;
+            strncpy(usb_event->device, device, MAX_DEVICE_NAME_LENGTH);
+            return true;
+        }
+
+        udev_device_unref(dev);
     }
 
     udev_monitor_unref(mon);
@@ -146,7 +146,7 @@ bool find_removed_usb_device(char* device)
         if (same_exists) continue;
 
         // Found it!
-        strncpy(device, new_devices[i], MAX_DEVICE_NAME_LENGTH);
+        strncpy(device, devices[i], MAX_DEVICE_NAME_LENGTH);
         return true;
     }
 
