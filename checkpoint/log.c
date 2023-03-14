@@ -20,14 +20,14 @@ bool create_log(int id, char* description)
 {
     log_t log;
     time_t timestamp = time(NULL);
-    FILE* log_file = fopen(PATH_LOG, "a"); // Open in append mode
+    FILE* log_file = fopen(LOG_FILE_PATH, "a"); // Open in append mode
 
     if (log_file == NULL) return false;
 
-    // Create log struct, copy description until MAX_LENGTH_DESCRIPTION
+    // Create log struct, copy description until MAX_LENGTH_LOG_DESCRIPTION
     log.timestamp = timestamp;
     log.id = id;
-    strncpy(log.description, description, MAX_LENGTH_DESCRIPTION);
+    strncpy(log.description, description, MAX_LENGTH_LOG_DESCRIPTION);
 
     // Write log data to file
     fprintf(log_file, "%ld %d \"%s\"\n", log.timestamp, log.id, log.description);
@@ -48,8 +48,8 @@ bool create_emergency_solved_log(void)
 
 bool read_log(log_t* log, int index)
 {
-    FILE* log_file = fopen(PATH_LOG, "r");
-    char line[MAX_LENGTH_LINE];
+    FILE* log_file = fopen(LOG_FILE_PATH, "r");
+    char line[MAX_LENGTH_LOG_LINE];
 
     if (log_file == NULL) return false;
 
@@ -73,8 +73,8 @@ bool read_log(log_t* log, int index)
 
 int count_logs(void)
 {
-    FILE* log_file = fopen(PATH_LOG, "r");
-    char line[MAX_LENGTH_LINE];
+    FILE* log_file = fopen(LOG_FILE_PATH, "r");
+    char line[MAX_LENGTH_LOG_LINE];
     int count = 0;
 
     if (log_file == NULL) return 0;
@@ -88,8 +88,8 @@ int count_logs(void)
 
 bool is_emergency_active(void)
 {
-    FILE* log_file = fopen(PATH_LOG, "r");
-    char line[MAX_LENGTH_LINE];
+    FILE* log_file = fopen(LOG_FILE_PATH, "r");
+    char line[MAX_LENGTH_LOG_LINE];
     bool emergency_active = false;
 
     if (log_file == NULL) return false;

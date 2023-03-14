@@ -15,7 +15,9 @@
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
 
-#define PATH_CONFIG "./resources/safecheck.conf"
+#define CONFIG_FILE_NAME "safecheck.conf"
+#define CONFIG_FILE_PATH "/etc/safecheck.conf"
+#define CONFIG_DIRECTORY "/etc/"
 #define MAX_CHECKPOINTS 64
 #define MAX_NAME_LENGTH 256
 #define MAX_PARTICIPANTS 351
@@ -59,5 +61,13 @@ typedef struct configuration conf_t;
  * @return True if the configuration file was read successfully, false otherwise.
 */
 bool read_configuration(conf_t* configuration, char* path_to_configuration_file);
+
+/**
+ * Write the data of a configuration structure in a file.
+ * @param configuration Pointer to the configuration structure.
+ * @param path_to_configuration_file Path to the configuration file.
+ * @return True if the configuration file was written successfully, false otherwise.
+*/
+bool write_configuration(conf_t* configuration, char* path_to_configuration_file);
 
 #endif

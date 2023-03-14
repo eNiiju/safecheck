@@ -13,14 +13,7 @@
 #include "rfid.h"
 #include "usb_key.h"
 
-/* ------------------------------------------------------------------------- */
-/*                          Constants & Definitions                          */
-/* ------------------------------------------------------------------------- */
-
-#define RFID_CODE_PARTICIPANT_RANGE_START 0
-#define RFID_CODE_PARTICIPANT_RANGE_END 10000
-#define RFID_CODE_RESOLVE_EMERGENCY 10001
-#define RFID_CODE_RESET 10002
+#include <stdbool.h>
 
 /* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */
@@ -60,3 +53,22 @@ void* send_data_routine(void* arg);
  * @param arg Unused.
 */
 void* usb_key_routine(void* arg);
+
+/**
+ * Initialization function. Prints error if they happen.
+ * @return True if initialization was successful, false otherwise.
+*/
+bool init(void);
+
+/**
+ * Copy the log file to the USB key.
+ * Prints error if they happen.
+*/
+void copy_log_file_to_usb();
+
+/**
+ * Copy the configuration file from the USB key to the local 
+ * Safecheck configuration directory.
+ * Prints error if they happen.
+*/
+void copy_config_file_from_usb();

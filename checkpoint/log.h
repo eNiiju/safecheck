@@ -16,9 +16,11 @@
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
 
-#define PATH_LOG "./resources/safecheck.log"
-#define MAX_LENGTH_DESCRIPTION 256
-#define MAX_LENGTH_LINE 10 /* timestamp */ + 11 /* id */ + 2 /* quotes */ + MAX_LENGTH_DESCRIPTION + 3 /* spaces & newline */
+#define LOG_FILE_NAME "safecheck.log"
+#define LOG_FILE_PATH "/var/log/safecheck/safecheck.log"
+#define LOG_DIRECTORY "/var/log/safecheck/"
+#define MAX_LENGTH_LOG_DESCRIPTION 256
+#define MAX_LENGTH_LOG_LINE 10 /* timestamp */ + 11 /* id */ + 2 /* quotes */ + MAX_LENGTH_LOG_DESCRIPTION + 3 /* spaces & newline */
 #define EMERGENCY_ID -1
 #define EMERGENCY_SOLVED_ID -2
 #define EMERGENCY_DESCRIPTION "Emergency button pressed"
@@ -34,7 +36,7 @@
 struct log {
     time_t timestamp;
     int id; // Runner ID or ID_EMERGENCY for emergency, ID_EMERGENCY_SOLVED for emergency solved
-    char description[MAX_LENGTH_DESCRIPTION]; // The participant's name, or emergency description
+    char description[MAX_LENGTH_LOG_DESCRIPTION]; // The participant's name, or emergency description
 };
 
 typedef struct log log_t;
