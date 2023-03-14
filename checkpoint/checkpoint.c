@@ -101,7 +101,7 @@ void* usb_key_routine(void* arg)
             copy_config_file_from_usb();
 
             // Unmount device
-            if (umount(usb_event.device) != 0) {
+            if (umount(USB_MOUNT_PATH) != 0) {
                 perror("umount failed");
                 break;
             }
