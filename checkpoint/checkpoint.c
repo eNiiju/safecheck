@@ -18,6 +18,12 @@
 #include <sys/stat.h>
 
 /* ------------------------------------------------------------------------- */
+/*                             Global variables                              */
+/* ------------------------------------------------------------------------- */
+
+conf_t configuration;
+
+/* ------------------------------------------------------------------------- */
 /*                               Main function                               */
 /* ------------------------------------------------------------------------- */
 
@@ -56,6 +62,9 @@ bool init(void)
         perror("Can't create usb mount path directory");
         return false;
     }
+
+    // Retrieve configuration
+
 
     return true;
 }
@@ -100,19 +109,64 @@ void* usb_key_routine(void* arg)
 
             printf("%s was mounted successfully.\n", usb_event.device);
 
+            // Copy log file to USB device
+            char path_to_log[30];
+            strcpy(path_to_log, USB_MOUNT_PATH);
+            strcat(path_to_log, "/");
+            strcat(path_to_log, LOG_FILE_NAME);
+
+            FILE* log_file = fopen(path_to_log, "w");
+            if (log_file != NULL) {
+                FILE* local_log_file = fopen(PATH_LOG, "r");
+                if (local_log_file != NULL) {
+                    char c;
+                    while ((c = fgetc(local_log_file)) != EOF)
+                        fputc(c, log_file);
+                    fclose(local_log_file);
+                }
+                else perror("Can't open local log file\n");
+                fclose(log_file);
+            }
+            else perror("Can't open log file\n");
+            fclose(log_file);
+
             // If there is a configuration file, copy it locally
             char path_to_config[30];
             strcpy(path_to_config, USB_MOUNT_PATH);
             strcat(path_to_config, "/");
             strcat(path_to_config, CONFIG_FILE_NAME);
+
             if (access(path_to_config, F_OK) == 0) {
-                // Retrieve configuration
-                // todo and make it check if it's a valid one?
+                // Retrieve configuration from USB device
+                printf("Configuration file found in USB device.\n");
+                bool ok;
+                conf_t conf;
 
-                // Write configuration
-                
+                ok = read_configuration(&conf, path_to_config);
+                if (!ok) {
+                    printf("Error while reading configuration file from USB device.\n");
+                    break;
+                }
+
+                // Write configuration locally
+                ok = write_configuration(&conf, PATH_CONFIG);
+                if (!ok) {
+                    printf("Error while writing configuration file locally.\n");
+                    break;
+                }
+
+                printf("Configuration file copied locally successfully.\n");
+
+                // Retrieve local configuration
+                ok = read_configuration(&configuration, PATH_CONFIG);
+
+                if (!ok) {
+                    printf("Error while reading configuration file locally.\n");
+                    break;
+                }
+
+                printf("Configuration updated.\n");
             }
-
             break;
         case USB_EVENT_DISCONNECT:
             printf("USB device disconnected: %s\n", usb_event.device);

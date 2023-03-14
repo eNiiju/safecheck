@@ -97,5 +97,16 @@ bool write_configuration(conf_t* configuration, char* path_to_configuration_file
     FILE* fp = fopen(path_to_configuration_file, "w");
     if (fp == NULL) return false;
 
-    // TODO
+    // Write the order
+    fprintf(fp, "%s\n", ORDER_SECTION_START);
+    for (int i = 0; i < configuration->nb_checkpoints; i++)
+        fprintf(fp, "%d\n", configuration->order[i]);
+
+    // Write the participants
+    fprintf(fp, "%s\n", PARTICIPANTS_SECTION_START);
+    for (int i = 0; i < configuration->nb_participants; i++)
+        fprintf(fp, "%d \"%s\"\n", configuration->participants[i].id, configuration->participants[i].name);
+
+    fclose(fp);
+    return true;
 }
