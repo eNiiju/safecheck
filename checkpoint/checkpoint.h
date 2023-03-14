@@ -20,12 +20,6 @@
 /* ------------------------------------------------------------------------- */
 
 /**
- * Initialization function. Prints error if they happen.
- * @return True if initialization was successful, false otherwise.
-*/
-bool init(void);
-
-/**
  * Function for the display thread.
  * It is responsible for displaying informations on the screen.
  * @param arg Unused.
@@ -59,3 +53,13 @@ void* send_data_routine(void* arg);
  * @param arg Unused.
 */
 void* usb_key_routine(void* arg);
+
+/**
+ * Initialization function. Prints error if they happen.
+ * @return True if initialization was successful, false otherwise.
+*/
+bool init(void);
+
+void copy_log_file_to_usb();
+
+void copy_config_file_from_usb();
