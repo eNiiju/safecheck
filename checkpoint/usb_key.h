@@ -18,7 +18,7 @@
 #define MAX_DEVICES 10
 #define MAX_DEVICE_NAME_LENGTH 10
 #define MAX_TRIES_FIND_DEVICE 10
-#define USB_MOUNT_PATH "/mnt/safecheck"
+#define USB_MOUNT_PATH "/mnt/safecheck/"
 #define USB_EVENT_CONNECT 1
 #define USB_EVENT_DISCONNECT 2
 

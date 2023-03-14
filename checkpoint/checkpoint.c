@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
@@ -31,7 +32,7 @@ int main(int argc, char* argv[])
 {
     pthread_t th_display, th_button, th_rfid, th_send_data, th_usb_key;
 
-    if (!init()) return -1;
+    if (!init()) exit(EXIT_FAILURE);
 
     // Create threads
     pthread_create(&th_display, NULL, display_routine, NULL);
@@ -47,7 +48,7 @@ int main(int argc, char* argv[])
     pthread_join(th_send_data, NULL);
     pthread_join(th_usb_key, NULL);
 
-    return 0;
+    exit(EXIT_SUCCESS);
 }
 
 /* ------------------------------------------------------------------------- */
@@ -63,8 +64,26 @@ bool init(void)
         return false;
     }
 
-    // Retrieve configuration
+    // Create log directory if it doesn't exist (and log file)
+    opendir(LOG_DIRECTORY);
+    if (errno == ENOENT && mkdir(LOG_DIRECTORY, 0777) != 0) {
+        perror("Can't create log directory");
+        return false;
+    }
 
+    // Create log file if it doesn't exist
+    FILE* log_file = fopen(LOG_FILE_PATH, "a");
+    if (log_file == NULL) {
+        perror("Can't create log file");
+        return false;
+    }
+    fclose(log_file);
+
+    // Retrieve configuration
+    if (!read_configuration(&configuration, CONFIG_FILE_PATH)) {
+        printf("Can't read configuration file\n");
+        return false;
+    }
 
     return true;
 }
@@ -112,16 +131,16 @@ void* usb_key_routine(void* arg)
             // Copy log file to USB device
             char path_to_log[30];
             strcpy(path_to_log, USB_MOUNT_PATH);
-            strcat(path_to_log, "/");
             strcat(path_to_log, LOG_FILE_NAME);
 
             FILE* log_file = fopen(path_to_log, "w");
             if (log_file != NULL) {
-                FILE* local_log_file = fopen(PATH_LOG, "r");
+                FILE* local_log_file = fopen(LOG_FILE_PATH, "r");
                 if (local_log_file != NULL) {
-                    char c;
-                    while ((c = fgetc(local_log_file)) != EOF)
-                        fputc(c, log_file);
+                    // Read local log file line by line and write it to the USB device
+                    char line[MAX_LENGTH_LOG_LINE];
+                    while (fgets(line, sizeof(line), local_log_file) != NULL)
+                        fputs(line, log_file);
                     fclose(local_log_file);
                 }
                 else perror("Can't open local log file\n");
@@ -133,7 +152,6 @@ void* usb_key_routine(void* arg)
             // If there is a configuration file, copy it locally
             char path_to_config[30];
             strcpy(path_to_config, USB_MOUNT_PATH);
-            strcat(path_to_config, "/");
             strcat(path_to_config, CONFIG_FILE_NAME);
 
             if (access(path_to_config, F_OK) == 0) {
@@ -149,7 +167,7 @@ void* usb_key_routine(void* arg)
                 }
 
                 // Write configuration locally
-                ok = write_configuration(&conf, PATH_CONFIG);
+                ok = write_configuration(&conf, CONFIG_FILE_PATH);
                 if (!ok) {
                     printf("Error while writing configuration file locally.\n");
                     break;
@@ -158,7 +176,7 @@ void* usb_key_routine(void* arg)
                 printf("Configuration file copied locally successfully.\n");
 
                 // Retrieve local configuration
-                ok = read_configuration(&configuration, PATH_CONFIG);
+                ok = read_configuration(&configuration, CONFIG_FILE_PATH);
 
                 if (!ok) {
                     printf("Error while reading configuration file locally.\n");
