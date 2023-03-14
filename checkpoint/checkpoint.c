@@ -196,32 +196,34 @@ void copy_config_file_from_usb()
     strcpy(path_to_config, USB_MOUNT_PATH);
     strcat(path_to_config, CONFIG_FILE_NAME);
 
-    if (access(path_to_config, F_OK) == 0) {
-        printf("Configuration file found in USB device.\n");
-
-        // Retrieve configuration from USB device
-        ok = read_configuration(&conf, path_to_config);
-        if (!ok) {
-            printf("Error while reading configuration file from USB device.\n");
-            return;
-        }
-
-        // Write configuration locally
-        ok = write_configuration(&conf, CONFIG_FILE_PATH);
-        if (!ok) {
-            printf("Error while writing configuration file locally.\n");
-            return;
-        }
-
-        printf("Configuration file copied locally successfully.\n");
-
-        // Retrieve local configuration
-        ok = read_configuration(&configuration, CONFIG_FILE_PATH);
-        if (!ok) {
-            printf("Error while reading configuration file locally.\n");
-            return;
-        }
-
-        printf("Configuration updated.\n");
+    if (access(path_to_config, F_OK) != 0) {
+        printf("No configuration file found in USB device.\n");
+        return;
     }
+    printf("Configuration file found in USB device.\n");
+
+    // Retrieve configuration from USB device
+    ok = read_configuration(&conf, path_to_config);
+    if (!ok) {
+        printf("Error while reading configuration file from USB device.\n");
+        return;
+    }
+
+    // Write configuration locally
+    ok = write_configuration(&conf, CONFIG_FILE_PATH);
+    if (!ok) {
+        printf("Error while writing configuration file locally.\n");
+        return;
+    }
+
+    printf("Configuration file copied locally successfully.\n");
+
+    // Retrieve local configuration
+    ok = read_configuration(&configuration, CONFIG_FILE_PATH);
+    if (!ok) {
+        printf("Error while reading configuration file locally.\n");
+        return;
+    }
+
+    printf("Configuration updated.\n");
 }
