@@ -61,4 +61,12 @@ typedef struct configuration conf_t;
 */
 bool read_configuration(conf_t* configuration, char* path_to_configuration_file);
 
+/**
+ * Write the data of a configuration structure in a file.
+ * @param configuration Pointer to the configuration structure.
+ * @param path_to_configuration_file Path to the configuration file.
+ * @return True if the configuration file was written successfully, false otherwise.
+*/
+bool write_configuration(conf_t* configuration, char* path_to_configuration_file);
+
 #endif

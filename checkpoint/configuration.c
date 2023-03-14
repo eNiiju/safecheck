@@ -91,3 +91,11 @@ bool read_configuration(conf_t* configuration, char* path_to_configuration_file)
 
     return true;
 }
+
+bool write_configuration(conf_t* configuration, char* path_to_configuration_file)
+{
+    FILE* fp = fopen(path_to_configuration_file, "w");
+    if (fp == NULL) return false;
+
+    // TODO
+}

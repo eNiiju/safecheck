@@ -90,7 +90,7 @@ void* usb_key_routine(void* arg)
         // A usb device event has occured
         switch (usb_event.event) {
         case USB_EVENT_CONNECT:
-            printf("Device connected: %s\n", usb_event.device);
+            printf("USB device connected: %s\n", usb_event.device);
 
             // Mount device to defined path
             if (mount(usb_event.device, USB_MOUNT_PATH, "vfat", 0, NULL) != 0) {
@@ -115,7 +115,7 @@ void* usb_key_routine(void* arg)
 
             break;
         case USB_EVENT_DISCONNECT:
-            printf("Device disconnected: %s\n", usb_event.device);
+            printf("USB device disconnected: %s\n", usb_event.device);
             break;
         }
     }
