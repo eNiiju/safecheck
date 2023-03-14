@@ -41,12 +41,34 @@ typedef struct usb_event usb_event_t;
 /*                            Function prototypes                            */
 /* ------------------------------------------------------------------------- */
 
+/**
+ * Waits for a USB event (connection or disconnection of the USB drive), find the device
+ * that was added or removed, and fill the usb_event structure with the event type and
+ * the device name, then returns.
+ * @param usb_event Pointer to the usb_event_t structure to fill.
+ * @return True if everything went well (usb_event structure is readable), false otherwise.
+*/
 bool wait_usb_event(usb_event_t* usb_event);
 
+/**
+ * Find which USB device was added.
+ * @param device Pointer to the char array to fill with the device name.
+ * @return True if a device was found, false otherwise.
+*/
 bool find_added_usb_device(char* device);
 
+/**
+ * Find which USB device was removed.
+ * @param device Pointer to the char array to fill with the device name.
+ * @return True if a device was found, false otherwise.
+*/
 bool find_removed_usb_device(char* device);
 
+/**
+ * Retrieve the list of USB devices currently connected (calling fdisk -l).
+ * @param devices Pointer to the array to fill with the device names.
+ * @return The number of devices found.
+*/
 int retrieve_usb_devices(char devices[][MAX_DEVICE_NAME_LENGTH + 1]);
 
 #endif

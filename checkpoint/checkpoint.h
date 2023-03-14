@@ -60,6 +60,15 @@ void* usb_key_routine(void* arg);
 */
 bool init(void);
 
+/**
+ * Copy the log file to the USB key.
+ * Prints error if they happen.
+*/
 void copy_log_file_to_usb();
 
+/**
+ * Copy the configuration file from the USB key to the local 
+ * Safecheck configuration directory.
+ * Prints error if they happen.
+*/
 void copy_config_file_from_usb();
