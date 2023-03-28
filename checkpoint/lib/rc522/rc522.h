@@ -23,7 +23,7 @@
  * Fixed number of bugs and code clean-up.
  */
 
-#include "main.h"
+#include "rc522_main.h"
 
 // the registers that are RFU (reserved for future use) have been left out.
 

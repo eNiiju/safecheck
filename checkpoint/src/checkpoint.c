@@ -34,6 +34,8 @@ int main(int argc, char* argv[])
 
     if (!init()) exit(EXIT_FAILURE);
 
+    my_read();
+
     // Create threads
     pthread_create(&th_display, NULL, display_routine, NULL);
     pthread_create(&th_button, NULL, button_routine, NULL);

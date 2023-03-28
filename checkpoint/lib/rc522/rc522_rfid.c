@@ -24,7 +24,7 @@
  * 	read_tag_raw() call added
  */
 
-#include "rfid.h"
+#include "rc522_rfid.h"
 
 // buffer for 18 (maxRLEN) bytes
 uint8_t buff[MAXRLEN];

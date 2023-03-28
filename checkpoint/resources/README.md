@@ -1,5 +1,10 @@
 # File locations
 
-`safecheck.conf` - /opt/safecheck.conf
+## safecheck.conf
 
-`safecheck.log` - (Auto-generated) /var/log/safecheck.log
+Located in `/etc/safecheck.conf`
+
+## safecheck.log 
+
+Log files are auto-generated in `/var/log/safecheck/safecheck-xxx.log`,
+"xxx" being the ID of the race. 

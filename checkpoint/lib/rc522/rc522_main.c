@@ -67,7 +67,7 @@
 
 char VERSION[] = "1.65.3";
 
-#include "main.h"
+#include "rc522_main.h"
 
 // command line options
 uint8_t debug=0;			// trigger for debug messages
@@ -2418,7 +2418,7 @@ int write_message(uint8_t *mess, int start_sector, int start_block, int len)
 	return(TAG_OK);
 }
 
-int main(int argc, char *argv[]) {
+int _main(int argc, char *argv[]) {
 
     int     tmp;
     int     d_write = 0,d_read = 0, action=0, change=0, add_act=0;

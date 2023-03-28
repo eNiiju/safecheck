@@ -25,7 +25,7 @@
  * 
  */
 
-#include "config.h"
+#include "rc522_config.h"
 
 char config_file[255]=default_config_file;
 FILE *fdconfig=NULL;

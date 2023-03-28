@@ -1,29 +1,37 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -Wno-unused-parameter
-LDFLAGS=-lpthread -ludev
+CHECKPOINTOBJ=src/configuration.o src/display.o src/kineis.o src/log.o src/rfid.o src/usb_key.o
+LIBRC522OBJ=lib/rc522/rc522.o lib/rc522/rc522_config.o lib/rc522/rc522_main.o lib/rc522/rc522_rfid.o lib/rc522/rc522_value.o
 
-all: checkpoint
+all: src/checkpoint
 
 clean:
-	rm -f *.o checkpoint
+	rm -f src/*.o src/checkpoint
+	cd lib/rc522 && make clean
 
-checkpoint: checkpoint.c checkpoint.h configuration.o display.o kineis.o log.o rfid.o usb_key.o
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+# Main program
+src/checkpoint: src/checkpoint.c src/checkpoint.h $(CHECKPOINTOBJ) $(LIBRC522OBJ)
+	$(CC) $(CFLAGS) $^ -o $@ -lpthread -lbcm2835 -ludev
 
-configuration.o: configuration.c configuration.h
+src/configuration.o: src/configuration.c src/configuration.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-display.o: display.c display.h
+src/display.o: src/display.c src/display.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-kineis.o: kineis.c kineis.h
+src/kineis.o: src/kineis.c src/kineis.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-log.o: log.c log.h
+src/log.o: src/log.c src/log.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-rfid.o: rfid.c rfid.h
-	$(CC) $(CFLAGS) -c $< -o $@
+src/rfid.o: src/rfid.c src/rfid.h lib/rc522
+	$(CC) $(CFLAGS) -c $< -o $@ -lbcm2835
 
-usb_key.o: usb_key.c usb_key.h
-	$(CC) $(CFLAGS) -c $< -o $@
+src/usb_key.o: src/usb_key.c src/usb_key.h
+	$(CC) $(CFLAGS) -c $< -o $@ -ludev
+
+# Libraries
+.PHONY: lib/rc522
+lib/rc522:
+	cd lib/rc522 && make

@@ -18,7 +18,7 @@
  * initial version for value block handling
  */
 
-#include "value.h"
+#include "rc522_value.h"
 
 /* check for valid value block
  * 
