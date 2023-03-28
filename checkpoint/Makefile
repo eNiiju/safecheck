@@ -2,6 +2,7 @@ CC=gcc
 CFLAGS=-Wall -Wextra -Wno-unused-parameter
 CHECKPOINTOBJ=src/configuration.o src/display.o src/kineis.o src/log.o src/rfid.o src/usb_key.o
 LIBRC522OBJ=lib/rc522/rc522.o lib/rc522/rc522_config.o lib/rc522/rc522_main.o lib/rc522/rc522_rfid.o lib/rc522/rc522_value.o
+LDFLAGS=-lpthread -lbcm2835 -ludev
 
 all: src/checkpoint
 
@@ -11,7 +12,7 @@ clean:
 
 # Main program
 src/checkpoint: src/checkpoint.c src/checkpoint.h $(CHECKPOINTOBJ) $(LIBRC522OBJ)
-	$(CC) $(CFLAGS) $^ -o $@ -lpthread -lbcm2835 -ludev
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 src/configuration.o: src/configuration.c src/configuration.h
 	$(CC) $(CFLAGS) -c $< -o $@
