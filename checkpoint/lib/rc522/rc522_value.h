@@ -18,7 +18,7 @@
  * initial version of value block handling
  */
 
-#include "main.h"
+#include "rc522_main.h"
 
 #ifndef value_H_
 #define value_H_

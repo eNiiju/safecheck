@@ -21,7 +21,7 @@
  * Fixed number of bugs and code clean-up.
  */
 
-#include "main.h"
+#include "rc522_main.h"
 
 #ifndef CONFIG_H_
 #define CONFIG_H_

@@ -51,10 +51,10 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#include "rfid.h"
-#include "config.h"
-#include "rfid.h"
-#include "value.h"
+#include "rc522_rfid.h"
+#include "rc522_config.h"
+#include "rc522_rfid.h"
+#include "rc522_value.h"
 #include "rc522.h"
 
 // color display enable
