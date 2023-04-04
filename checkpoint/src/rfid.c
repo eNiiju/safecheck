@@ -16,25 +16,50 @@
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
 
-void my_read()
+bool wait_rfid_read(rfid_read_t* rfid_read)
 {
+    int code;
+    unsigned char buffer[READ_BLOCK_BUFFER_SIZE];
+    unsigned int converted_decimal;
+
+    // Define configuration constants for rc522 lib
     uint8_t gpio = 22;
     uint32_t spi_speed = 1000L;
+
+    // Configure and initialize rc522 lib
     if (get_config_file()) exit(1);
     if (HW_init(spi_speed, gpio)) close_out(1);
     InitRc522();
 
-    int max_blocks = 64;
-    int addr = -1, tmp;
-    unsigned char buff[35];
+    // Read runner ID
+    code = read_block(RFID_BLOCK_ADRESS_CODE, buffer, 0);
+    if (code == TAG_ERR) return false;
+    sscanf((const char*)buffer, "%x", &converted_decimal); // Convert to decimal
+    rfid_read->code = converted_decimal;
 
-    // get valid block (reading block 0 is allowed)
-    printf("Please provide the block (Max %d) to read : ", max_blocks - 1);
-    addr = get_block_number(max_blocks - 1, 0);
-
-    // read block and display content
-    tmp = read_block(addr, buff, 1);
-
-    // close / disconnect the card
+    // Close / disconnect the RFID card
     PcdHalt();
+
+    // Read runner name
+    code = read_block(RFID_BLOCK_ADRESS_NAME, buffer, 0);
+    if (code == TAG_ERR) return false;
+
+    // Convert array of characters representing a byte by groups of two to real byte array
+    char byte_array[MAX_LENGTH_FIRST_NAME + MAX_LENGTH_LAST_NAME];
+    char tmp_string[3];
+    for (int i = 0; i < READ_BLOCK_BUFFER_SIZE; i += 2) {
+        tmp_string[0] = buffer[i];
+        tmp_string[1] = buffer[i + 1];
+        tmp_string[2] = '\0';
+        byte_array[i / 2] = strtol(tmp_string, NULL, 16);
+    }
+
+    // Copy first and last name in struct
+    strncpy(rfid_read->first_name, byte_array, MAX_LENGTH_FIRST_NAME);
+    strncpy(rfid_read->last_name, byte_array + MAX_LENGTH_FIRST_NAME, MAX_LENGTH_LAST_NAME);
+
+    // Close / disconnect the RFID card
+    PcdHalt();
+
+    return true;
 }
