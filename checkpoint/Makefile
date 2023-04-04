@@ -19,6 +19,9 @@ src/configuration.o: src/configuration.c src/configuration.h
 
 src/display.o: src/display.c src/display.h
 	$(CC) $(CFLAGS) -c $< -o $@
+#export LD_LIBRARY_PATH=/home/matheo/safecheck/checkpoint/lib/libssd1306/lib
+#gcc -c ./src/display.c -o ./src/display.o -l:libssd1306_i2c.so.0.0.3 -L/home/matheo/safecheck/checkpoint/lib/libssd1306/libc
+#gcc ./src/display.o ./test/test_display.c -o ./test/test_display -l:libssd1306_i2c.so.0.0.3 -L/home/matheo/safecheck/checkpoint/lib/libssd1306/lib
 
 src/kineis.o: src/kineis.c src/kineis.h
 	$(CC) $(CFLAGS) -c $< -o $@
