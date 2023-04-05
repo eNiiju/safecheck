@@ -67,6 +67,22 @@ void* button_routine(void* arg)
 
 void* rfid_routine(void* arg)
 {
+    rfid_read_t rfid_read;
+
+    while (1) {
+        if (!wait_rfid_read(&rfid_read)) {
+            printf("Problem when reading RFID card.\n");
+            continue;
+        }
+
+        printf("Received code : %d\n", rfid_read.code);
+        printf("Admin : %s\n", rfid_read.admin ? "true" : "false");
+        if (!rfid_read.admin) {
+            printf("Received first name : %s\n", rfid_read.first_name);
+            printf("Received last name : %s\n", rfid_read.last_name);
+        }
+    }
+
     pthread_exit(NULL);
 }
 

@@ -13,3 +13,6 @@ sudo make check
 sudo make install
 cd ..
 rm -rf bcm2835-1.56 bcm2835-1.56.tar.gz
+
+# Copy RC522 conf in /etc
+cp ./lib/RC522.conf /etc/
