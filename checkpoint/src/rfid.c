@@ -40,6 +40,15 @@ bool wait_rfid_read(rfid_read_t* rfid_read)
     // Close / disconnect the RFID card
     PcdHalt();
 
+    // If admin, don't read name
+    rfid_read->admin = rfid_read->code == RFID_CODE_ADMIN;
+    if (rfid_read->admin) 
+        return true;
+
+    // If illegal code
+    if (rfid_read->code < RFID_CODE_PARTICIPANT_RANGE_START || rfid_read->code > RFID_CODE_PARTICIPANT_RANGE_END)
+        return false;
+
     // Read runner name
     code = read_block(RFID_BLOCK_ADRESS_NAME, buffer, 0);
     if (code == TAG_ERR) return false;
