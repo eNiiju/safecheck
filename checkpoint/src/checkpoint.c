@@ -61,9 +61,6 @@ int main(int argc, char* argv[])
 
 void* display_routine(void* arg)
 {
-    display_error(p_display, p_framebuffer);
-    sleep(1);
-    display_ok(p_display, p_framebuffer);
     pthread_exit(NULL);
 }
 
@@ -79,6 +76,7 @@ void* rfid_routine(void* arg)
     while (1) {
         if (!wait_rfid_read(&rfid_read)) {
             printf("Problem when reading RFID card.\n");
+            display_error(p_display, p_framebuffer);
             continue;
         }
 
@@ -110,12 +108,15 @@ void* usb_key_routine(void* arg)
         case USB_EVENT_CONNECT:
             printf("USB device connected: %s\n", usb_event.device);
 
-            // Mount device to defined path
-            if (mount(usb_event.device, USB_MOUNT_PATH, "vfat", 0, NULL) != 0) {
+            // Mount device to defined path (first partition)
+            char partition[MAX_DEVICE_NAME_LENGTH + 2];
+            strcpy(partition, usb_event.device);
+            strcat(partition, "1");
+            if (mount(partition, USB_MOUNT_PATH, "vfat", 0, NULL) != 0) {
                 perror("mount failed");
                 break;
             }
-            printf("%s was mounted successfully.\n", usb_event.device);
+            printf("%s was mounted successfully.\n", partition);
 
             // Copy local log file to USB device
             copy_log_file_to_usb();
@@ -128,7 +129,9 @@ void* usb_key_routine(void* arg)
                 perror("umount failed");
                 break;
             }
-            printf("%s was unmounted successfully.\n", usb_event.device);
+            printf("%s was unmounted successfully.\n", partition);
+
+            display_ok(p_display, p_framebuffer);
             break;
         case USB_EVENT_DISCONNECT:
             printf("USB device disconnected: %s\n", usb_event.device);

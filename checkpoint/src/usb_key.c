@@ -12,6 +12,9 @@
 #include <unistd.h>
 #include <string.h>
 #include <libudev.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/fs.h>
 
 /* ------------------------------------------------------------------------- */
 /*                             Global variables                              */
@@ -155,26 +158,26 @@ bool find_removed_usb_device(char* device)
 
 int retrieve_usb_devices(char devices[][MAX_DEVICE_NAME_LENGTH + 1])
 {
-    char output[1000];
+    char device_name[MAX_DEVICE_NAME_LENGTH];
+    int nb_devices = 0;
+    int fd;
 
-    // Run fdisk command, only show lines starting with /dev/sd
-    // so that we get the list of usb devices, and capture output
-    FILE* fp = popen("fdisk -l | grep ^/dev/sd", "r");
-    if (fp == NULL) {
-        printf("Failed to run fdisk command\n");
-        return 0;
+    for (int j = 0; j < MAX_DEVICES; j++) {
+        snprintf(device_name, MAX_DEVICE_NAME_LENGTH, "/dev/sd%c", 'a' + j);
+        fd = open(device_name, O_RDONLY | O_NONBLOCK);
+
+        if (fd >= 0) {
+            // Check if the device is a USB device by checking its block size
+            int block_size;
+            if (ioctl(fd, BLKSSZGET, &block_size) == 0 && block_size == 512) {
+                // It's a USB device ! Add it to the list
+                strncpy(devices[nb_devices], device_name, MAX_DEVICE_NAME_LENGTH);
+                nb_devices++;
+            }
+
+            close(fd);
+        }
     }
 
-    // Read the output of the command line by line
-    int i = 0;
-    while (fgets(output, sizeof(output), fp) != NULL) {
-        char* device = strtok(output, " ");
-        strncpy(devices[i], device, MAX_DEVICE_NAME_LENGTH);
-        i++;
-    }
-
-    if (ferror(fp)) printf("Error reading output of fdisk command\n");
-
-    pclose(fp); // Close the pipe and exit
-    return i;
+    return nb_devices;
 }
