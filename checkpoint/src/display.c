@@ -14,14 +14,14 @@
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
 
-void display_string(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, char* string, int x, int y, int font_size)
+void display_string(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, char string[DISPLAY_MAX_STRING_LENGTH], int x, int y, int font_size)
 {
     ssd1306_framebuffer_box_t bbox;
     char* token;
-    char _string[(DISPLAY_MAX_LINE_CHAR * DISPLAY_MAX_LINES_VISIBLE) + DISPLAY_MAX_LINES_VISIBLE];
+    char _string[DISPLAY_MAX_STRING_LENGTH];
 
     // Copy input string
-    strncpy(_string, string, (DISPLAY_MAX_LINE_CHAR * 3) + 3);
+    strncpy(_string, string, DISPLAY_MAX_STRING_LENGTH);
 
     ssd1306_framebuffer_clear(p_framebuffer);
 
@@ -38,21 +38,20 @@ void display_string(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuff
 
 void display_message_array(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, display_message_t msg, int nb_lines)
 {
-    int cpt = 0;
-    char s[(DISPLAY_MAX_LINE_CHAR * 3) + 3];
+    char string[DISPLAY_MAX_STRING_LENGTH];
 
     ssd1306_framebuffer_clear(p_framebuffer);
 
-    while (s[0] != '\0' && cpt < nb_lines) {
-        strcpy(s, "\0");
-        strcat(s, msg.lines[cpt]);
-        strcat(s, "\n");
-        strcat(s, msg.lines[cpt + 1]);
-        strcat(s, "\n");
-        strcat(s, msg.lines[cpt + 2]);
-        display_string(p_display, p_framebuffer, s, DISPLAY_X_OFFSET, DISPLAY_Y_OFFSET, DEFAULT_FONTSIZE);
+    // Display 3 lines, wait, and display the next 3
+    for (int i = 0; string[0] != '\0' && i < nb_lines; i += 3) {
+        strcpy(string, "\0");
+        strcat(string, msg.lines[i]);
+        strcat(string, "\n");
+        strcat(string, msg.lines[i + 1]);
+        strcat(string, "\n");
+        strcat(string, msg.lines[i + 2]);
+        display_string(p_display, p_framebuffer, string, DISPLAY_X_OFFSET, DISPLAY_Y_OFFSET, DEFAULT_FONTSIZE);
         sleep(5);
-        cpt = cpt + 3;
     }
 
     ssd1306_framebuffer_clear(p_framebuffer);
@@ -60,20 +59,16 @@ void display_message_array(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_fr
 
 void display_error(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer)
 {
-    ssd1306_framebuffer_box_t bbox;
-
     ssd1306_framebuffer_clear(p_framebuffer);
-    ssd1306_framebuffer_draw_text(p_framebuffer, "X", sizeof(char) * strlen("X"), 46, 46, SSD1306_FONT_DEFAULT, 12, &bbox);
+    ssd1306_framebuffer_draw_text(p_framebuffer, "X", sizeof(char) * strlen("X"), 46, 46, SSD1306_FONT_DEFAULT, 12, NULL);
     ssd1306_i2c_display_update(p_display, p_framebuffer);
     ssd1306_framebuffer_clear(p_framebuffer);
 }
 
 void display_ok(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer)
 {
-    ssd1306_framebuffer_box_t bbox;
-
     ssd1306_framebuffer_clear(p_framebuffer);
-    ssd1306_framebuffer_draw_text(p_framebuffer, "OK", sizeof(char) * strlen("OK"), 32, 46, SSD1306_FONT_DEFAULT, 10, &bbox);
+    ssd1306_framebuffer_draw_text(p_framebuffer, "OK", sizeof(char) * strlen("OK"), 32, 46, SSD1306_FONT_DEFAULT, 10, NULL);
     ssd1306_i2c_display_update(p_display, p_framebuffer);
     ssd1306_framebuffer_clear(p_framebuffer);
 }

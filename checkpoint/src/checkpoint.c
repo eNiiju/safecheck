@@ -62,6 +62,8 @@ int main(int argc, char* argv[])
 void* display_routine(void* arg)
 {
     display_error(p_display, p_framebuffer);
+    sleep(1);
+    display_ok(p_display, p_framebuffer);
     pthread_exit(NULL);
 }
 

@@ -25,6 +25,7 @@
 #define DISPLAY_MAX_LINE_CHAR 32
 #define DISPLAY_MAX_LINES 30
 #define DISPLAY_MAX_LINES_VISIBLE 3
+#define DISPLAY_MAX_STRING_LENGTH (DISPLAY_MAX_LINE_CHAR * DISPLAY_MAX_LINES_VISIBLE) + DISPLAY_MAX_LINES_VISIBLE // 3 lines + '\n'
 
 /* ------------------------------------------------------------------------- */
 /*                             Type definitions                              */
@@ -55,7 +56,7 @@ typedef struct display_message display_message_t;
  * @param y Y starting position of the string
  * @param font_size Font size
 */
-void display_string(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, char* string, int x, int y, int font_size);
+void display_string(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, char string[DISPLAY_MAX_STRING_LENGTH], int x, int y, int font_size);
 
 /**
  * Display a multi-line message, 3 lines at a time.
