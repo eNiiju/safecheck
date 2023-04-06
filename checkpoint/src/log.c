@@ -16,7 +16,7 @@
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
 
-bool create_log(int id, char* description)
+bool create_log(int code, char* description)
 {
     log_t log;
     time_t timestamp = time(NULL);
@@ -26,11 +26,11 @@ bool create_log(int id, char* description)
 
     // Create log struct, copy description until MAX_LENGTH_LOG_DESCRIPTION
     log.timestamp = timestamp;
-    log.id = id;
+    log.code = code;
     strncpy(log.description, description, MAX_LENGTH_LOG_DESCRIPTION);
 
     // Write log data to file
-    fprintf(log_file, "%ld %d \"%s\"\n", log.timestamp, log.id, log.description);
+    fprintf(log_file, "%ld %d \"%s\"\n", log.timestamp, log.code, log.description);
 
     fclose(log_file);
     return true;
@@ -38,12 +38,12 @@ bool create_log(int id, char* description)
 
 bool create_emergency_log(void)
 {
-    return create_log(EMERGENCY_ID, EMERGENCY_DESCRIPTION);
+    return create_log(EMERGENCY_CODE, EMERGENCY_DESCRIPTION);
 }
 
 bool create_emergency_solved_log(void)
 {
-    return create_log(EMERGENCY_SOLVED_ID, EMERGENCY_SOLVED_DESCRIPTION);
+    return create_log(EMERGENCY_SOLVED_CODE, EMERGENCY_SOLVED_DESCRIPTION);
 }
 
 bool read_log(log_t* log, int index)
@@ -56,14 +56,14 @@ bool read_log(log_t* log, int index)
     for (int i = 0; fgets(line, sizeof(line), log_file) != NULL; i++) {
         if (i != index) continue;
 
-        // Split line into timestamp, id and description
+        // Split line into timestamp, code and description
         char* timestamp = strtok(line, " ");
-        char* id = strtok(NULL, " \"");
+        char* code = strtok(NULL, " \"");
         char* description = strtok(NULL, "\"");
 
         // Copy data to log struct
         log->timestamp = atol(timestamp);
-        log->id = atoi(id);
+        log->code = atoi(code);
         strcpy(log->description, description);
     }
 
@@ -95,14 +95,14 @@ bool is_emergency_active(void)
     if (log_file == NULL) return false;
 
     while (fgets(line, sizeof(line), log_file) != NULL) {
-        // Split line to get the id
+        // Split line to get the code
         strtok(line, " ");
-        char* id = strtok(NULL, " \"");
+        char* code = strtok(NULL, " \"");
 
-        // Update emergency_active if id is EMERGENCY_ID or EMERGENCY_SOLVED_ID
-        if (atoi(id) == EMERGENCY_ID)
+        // Update emergency_active if code is EMERGENCY_CODE or EMERGENCY_SOLVED_CODE
+        if (atoi(code) == EMERGENCY_CODE)
             emergency_active = true;
-        else if (atoi(id) == EMERGENCY_SOLVED_ID)
+        else if (atoi(code) == EMERGENCY_SOLVED_CODE)
             emergency_active = false;
     }
 

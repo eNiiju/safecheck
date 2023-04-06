@@ -20,9 +20,9 @@
 #define LOG_FILE_PATH "/var/log/safecheck/safecheck.log"
 #define LOG_DIRECTORY "/var/log/safecheck/"
 #define MAX_LENGTH_LOG_DESCRIPTION 256
-#define MAX_LENGTH_LOG_LINE 10 /* timestamp */ + 11 /* id */ + 2 /* quotes */ + MAX_LENGTH_LOG_DESCRIPTION + 3 /* spaces & newline */
-#define EMERGENCY_ID -1
-#define EMERGENCY_SOLVED_ID -2
+#define MAX_LENGTH_LOG_LINE 10 /* timestamp */ + 11 /* code */ + 2 /* quotes */ + MAX_LENGTH_LOG_DESCRIPTION + 3 /* spaces & newline */
+#define EMERGENCY_CODE -1
+#define EMERGENCY_SOLVED_CODE -2
 #define EMERGENCY_DESCRIPTION "Emergency button pressed"
 #define EMERGENCY_SOLVED_DESCRIPTION "Emergency solved"
 
@@ -35,7 +35,7 @@
 */
 struct log {
     time_t timestamp;
-    int id; // Runner ID or ID_EMERGENCY for emergency, ID_EMERGENCY_SOLVED for emergency solved
+    int code; // Runner code or EMERGENCY_CODE for emergency, EMERGENCY_SOLVED_CODE for emergency solved
     char description[MAX_LENGTH_LOG_DESCRIPTION]; // The participant's name, or emergency description
 };
 
@@ -47,11 +47,11 @@ typedef struct log log_t;
 
 /**
  * Creates a log entry in the log file.
- * @param id The ID of the runner, or a special ID.
+ * @param code The code of the runner, or a special code.
  * @param description The description of the log entry. (e.g. the runner's name)
  * @return True if the log entry was created successfully, false otherwise.
 */
-bool create_log(int id, char* description);
+bool create_log(int code, char* description);
 
 /**
  * Creates an emergency log entry in the log file.

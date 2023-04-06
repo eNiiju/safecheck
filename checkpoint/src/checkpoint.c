@@ -86,6 +86,17 @@ void* rfid_routine(void* arg)
             printf("Received first name : %s\n", rfid_read.first_name);
             printf("Received last name : %s\n", rfid_read.last_name);
         }
+
+        // Log it !
+        if (!rfid_read.admin) {
+            char log_description[MAX_LENGTH_LOG_DESCRIPTION];
+            strcpy(log_description, rfid_read.first_name);
+            strcat(log_description, " ");
+            strcat(log_description, rfid_read.last_name);
+            bool created = create_log(rfid_read.code, log_description);
+            if (!created)
+                printf("Error when logging code:'%d' description:'%s'", rfid_read.code, log_description);
+        }
     }
 
     pthread_exit(NULL);
