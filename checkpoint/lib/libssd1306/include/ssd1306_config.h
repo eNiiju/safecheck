@@ -6,9 +6,7 @@
 /* include/_ssd1306_config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Debug Mode */
-#ifndef LIBSSD1306_DEBUG
-#define LIBSSD1306_DEBUG /**/
-#endif
+/* #undef DEBUG */
 
 /* Define to 1 if you have the `calloc' function. */
 #ifndef LIBSSD1306_HAVE_CALLOC
@@ -37,9 +35,7 @@
 #endif
 
 /* Have libev.h */
-#ifndef LIBSSD1306_HAVE_EV_H
-#define LIBSSD1306_HAVE_EV_H 1
-#endif
+/* #undef HAVE_EV_H */
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #ifndef LIBSSD1306_HAVE_FCNTL_H
@@ -195,7 +191,9 @@
 #endif
 
 /* No Debug Mode */
-/* #undef NDEBUG */
+#ifndef LIBSSD1306_NDEBUG
+#define LIBSSD1306_NDEBUG /**/
+#endif
 
 /* Name of package */
 #ifndef LIBSSD1306_PACKAGE

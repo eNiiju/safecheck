@@ -18,6 +18,8 @@ LIBRC522OBJ=lib/rc522/rc522.o lib/rc522/rc522_config.o lib/rc522/rc522_main.o li
 
 all: src/checkpoint
 
+libs: lib/rc522 lib/libssd1306
+
 clean:
 	rm -f src/*.o src/checkpoint test/test_display
 	cd lib/rc522 && make clean
@@ -28,7 +30,7 @@ src/checkpoint: src/checkpoint.c src/checkpoint.h $(CHECKPOINTOBJ) $(LIBRC522OBJ
 src/configuration.o: src/configuration.c src/configuration.h
 	$(CC) $(CFLAGS) -c $< -o $@
 
-src/display.o: src/display.c src/display.h
+src/display.o: src/display.c src/display.h lib/libssd1306
 	$(CC) $(CFLAGS) -c $< -o $@ -L./lib/libssd1306/lib -l:libssd1306_i2c.so.0.0.3
 
 src/kineis.o: src/kineis.c src/kineis.h
@@ -54,6 +56,12 @@ test/test_display: test/test_display.c src/display.o
 #                                  Libraries                                  #
 # --------------------------------------------------------------------------- #
 
-.PHONY: lib/rc522
 lib/rc522:
 	cd lib/rc522 && make
+
+lib/libssd1306:
+	cd lib/libssd1306 && \
+	./autogen.sh && \
+	./configure --prefix=$(shell pwd)/lib/libssd1306 && \
+	make && \
+	make install

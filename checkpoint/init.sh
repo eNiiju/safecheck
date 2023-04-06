@@ -5,7 +5,9 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 # Install libraries
-sudo apt-get install libudev-dev
+sudo apt-get install libudev-dev \
+    libfreetype6-dev fonts-freefont-ttf ttf-bitstream-vera \
+    autoconf automake libtool autotools-dev build-essential pkg-config
 
 # Install bcm2835 library
 wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.56.tar.gz
