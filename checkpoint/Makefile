@@ -23,7 +23,7 @@ clean:
 	cd lib/rc522 && make clean
 
 src/checkpoint: src/checkpoint.c src/checkpoint.h $(CHECKPOINTOBJ) $(LIBRC522OBJ)
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) -L./lib/libssd1306/lib -l:libssd1306_i2c.so.0.0.3
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) -L./lib/libssd1306/lib -l:libssd1306_i2c.so.0.0.3 -Wl,-rpath=./lib/libssd1306/lib
 
 src/configuration.o: src/configuration.c src/configuration.h
 	$(CC) $(CFLAGS) -c $< -o $@

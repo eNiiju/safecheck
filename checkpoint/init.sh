@@ -4,6 +4,9 @@ if [ "$EUID" -ne 0 ]; then
     exit
 fi
 
+# Install libraries
+sudo apt-get install libudev-dev
+
 # Install bcm2835 library
 wget http://www.airspayce.com/mikem/bcm2835/bcm2835-1.56.tar.gz
 tar -zxf bcm2835-1.56.tar.gz
@@ -15,4 +18,4 @@ cd ..
 rm -rf bcm2835-1.56 bcm2835-1.56.tar.gz
 
 # Copy RC522 conf in /etc
-cp ./lib/RC522.conf /etc/
+sudo cp ./lib/rc522/RC522.conf /etc/

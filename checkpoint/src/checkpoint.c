@@ -163,12 +163,12 @@ bool init(void)
     fclose(log_file);
     printf("Log file OK.\n");
 
-    // Retrieve configuration
-    if (!read_configuration(&configuration, CONFIG_FILE_PATH)) {
-        printf("Can't read configuration file\n");
-        return false;
-    }
-    printf("Configuration OK.\n");
+    // // Retrieve configuration
+    // if (!read_configuration(&configuration, CONFIG_FILE_PATH)) {
+    //     printf("Can't read configuration file\n");
+    //     return false;
+    // }
+    // printf("Configuration OK.\n");
 
     return true;
 }
