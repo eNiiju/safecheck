@@ -22,13 +22,9 @@ bool wait_rfid_read(rfid_read_t* rfid_read)
     unsigned char buffer[READ_BLOCK_BUFFER_SIZE];
     unsigned int converted_decimal;
 
-    // Define configuration constants for rc522 lib
-    uint8_t gpio = 22;
-    uint32_t spi_speed = 1000L;
-
     // Configure and initialize rc522 lib
     if (get_config_file()) exit(1);
-    if (HW_init(spi_speed, gpio)) close_out(1);
+    if (HW_init(RFID_SPI_SPEED, RFID_GPIO)) close_out(1);
     InitRc522();
 
     // Read runner ID

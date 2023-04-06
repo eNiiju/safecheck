@@ -24,6 +24,10 @@
 
 conf_t configuration;
 
+// Variables to interact with the display
+ssd1306_i2c_t* p_display;
+ssd1306_framebuffer_t* p_framebuffer;
+
 /* ------------------------------------------------------------------------- */
 /*                               Main function                               */
 /* ------------------------------------------------------------------------- */
@@ -57,32 +61,7 @@ int main(int argc, char* argv[])
 
 void* display_routine(void* arg)
 {
-    ssd1306_framebuffer_box_t bbox;
-    ssd1306_i2c_t* p_display;
-    ssd1306_framebuffer_t* p_framebuffer;
-    display_tab_t tab={"jean", "jacques", "goldman", "anyway", "jsplus", "aled", "j'ai", "pas", "de", "phrase", "drole", "a", "ecrir"};
-
-    //************************init**************************//
-    //I previously made an init func but the library doesn't like me using 
-    //passing references by address so I just put the code here
-    p_display = ssd1306_i2c_open(BUS_ADDRESS, DEVICE_ADDRESS, DISPLAY_WIDTH, DISPLAY_HEIGHT, NULL);
-    if(!p_display){
-        printf("Error: Could not open display\n");
-        return -1;
-    }
-    if(ssd1306_i2c_display_initialize(p_display) < 0){
-        printf("Error: Could not initialize display\n");
-        ssd1306_i2c_close(p_display);
-        return -1;
-    }
-    sleep(3);
-    p_framebuffer=ssd1306_framebuffer_create(p_display->width, p_display->height, p_display->err);
-    //**********************end init**************************//
-
-    //write_string_to_display(p_display, p_framebuffer, "Hello World!\npd AHAHaAHHAAAahahaaahahanoe\nmat BG", 4, 16, 4);
-    //write_tab_to_display_scroll(p_display, p_framebuffer, tab, 14);
-    write_valid_to_display(p_display, p_framebuffer);
-
+    display_error(p_display, p_framebuffer);
     pthread_exit(NULL);
 }
 
@@ -172,7 +151,7 @@ bool init(void)
     }
     printf("USB mount path OK.\n");
 
-    // Create log directory if it doesn't exist (and log file)
+    // Create log directory if it doesn't exist
     opendir(LOG_DIRECTORY);
     if (errno == ENOENT && mkdir(LOG_DIRECTORY, 0777) != 0) {
         perror("Can't create log directory");
@@ -189,12 +168,19 @@ bool init(void)
     fclose(log_file);
     printf("Log file OK.\n");
 
-    // // Retrieve configuration
-    // if (!read_configuration(&configuration, CONFIG_FILE_PATH)) {
-    //     printf("Can't read configuration file\n");
-    //     return false;
-    // }
-    // printf("Configuration OK.\n");
+    // Init display
+    p_display = ssd1306_i2c_open(DISPLAY_I2C_BUS_ADDRESS, DISPLAY_I2C_DEVICE_ADDRESS, DISPLAY_WIDTH, DISPLAY_HEIGHT, NULL);
+    if (!p_display) {
+        printf("Error: Could not open display\n");
+        return false;
+    }
+    if (ssd1306_i2c_display_initialize(p_display) < 0) {
+        printf("Error: Could not initialize display\n");
+        ssd1306_i2c_close(p_display);
+        return false;
+    }
+    sleep(3);
+    p_framebuffer = ssd1306_framebuffer_create(p_display->width, p_display->height, p_display->err);
 
     return true;
 }

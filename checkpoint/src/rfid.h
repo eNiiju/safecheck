@@ -15,6 +15,8 @@
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
 
+#define RFID_GPIO 22
+#define RFID_SPI_SPEED 1000L
 #define RFID_CODE_PARTICIPANT_RANGE_START 1
 #define RFID_CODE_PARTICIPANT_RANGE_END 999
 #define RFID_CODE_ADMIN 10000
