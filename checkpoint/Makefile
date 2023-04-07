@@ -7,7 +7,7 @@ CFLAGS=-Wall -Wextra -Wno-unused-parameter
 
 # Checkpoint main executable
 LDFLAGS=-lpthread -lbcm2835 -ludev
-CHECKPOINTOBJ=src/configuration.o src/display.o src/kineis.o src/log.o src/rfid.o src/usb_key.o
+CHECKPOINTOBJ=src/display.o src/kineis.o src/log.o src/rfid.o src/usb_key.o
 
 # RFID
 LIBRC522OBJ=lib/rc522/rc522.o lib/rc522/rc522_config.o lib/rc522/rc522_main.o lib/rc522/rc522_rfid.o lib/rc522/rc522_value.o
@@ -26,9 +26,6 @@ clean:
 
 src/checkpoint: src/checkpoint.c src/checkpoint.h $(CHECKPOINTOBJ) $(LIBRC522OBJ)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) -L./lib/libssd1306/lib -l:libssd1306_i2c.so.0.0.3 -Wl,-rpath=./lib/libssd1306/lib
-
-src/configuration.o: src/configuration.c src/configuration.h
-	$(CC) $(CFLAGS) -c $< -o $@
 
 src/display.o: src/display.c src/display.h lib/libssd1306
 	$(CC) $(CFLAGS) -c $< -o $@ -L./lib/libssd1306/lib -l:libssd1306_i2c.so.0.0.3

@@ -22,8 +22,6 @@
 /*                             Global variables                              */
 /* ------------------------------------------------------------------------- */
 
-conf_t configuration;
-
 // Variables to interact with the display
 ssd1306_i2c_t* p_display;
 ssd1306_framebuffer_t* p_framebuffer;
@@ -87,16 +85,27 @@ void* rfid_routine(void* arg)
             printf("Received last name : %s\n", rfid_read.last_name);
         }
 
-        // Log it !
-        if (!rfid_read.admin) {
-            char log_description[MAX_LENGTH_LOG_DESCRIPTION];
-            strcpy(log_description, rfid_read.first_name);
-            strcat(log_description, " ");
-            strcat(log_description, rfid_read.last_name);
-            bool created = create_log(rfid_read.code, log_description);
-            if (!created)
-                printf("Error when logging code:'%d' description:'%s'", rfid_read.code, log_description);
+        // If admin card, resolve emergency
+        if (rfid_read.admin) {
+            if (is_emergency_active()) {
+                bool created = create_emergency_solved_log();
+                created ? display_ok(p_display, p_framebuffer) : display_error(p_display, p_framebuffer);
+            }
+            else display_ok(p_display, p_framebuffer);
+            continue;
         }
+
+        // Log the participant passage
+        char log_description[MAX_LENGTH_LOG_DESCRIPTION];
+        strcpy(log_description, rfid_read.first_name);
+        strcat(log_description, " ");
+        strcat(log_description, rfid_read.last_name);
+        bool created = create_log(rfid_read.code, log_description);
+        if (!created)
+            printf("Error when logging code:'%d' description:'%s'", rfid_read.code, log_description);
+
+        // Print the last participants passages
+        // TODO
     }
 
     pthread_exit(NULL);
@@ -112,7 +121,11 @@ void* usb_key_routine(void* arg)
     usb_event_t usb_event;
 
     while (1) {
-        if (!wait_usb_event(&usb_event)) continue;
+        if (!wait_usb_event(&usb_event)) {
+            printf("Problem with USB event.\n");
+            display_error(p_display, p_framebuffer);
+            continue;
+        }
 
         // A usb device event has occured
         switch (usb_event.event) {
@@ -125,22 +138,18 @@ void* usb_key_routine(void* arg)
             strcat(partition, "1");
             if (mount(partition, USB_MOUNT_PATH, "vfat", 0, NULL) != 0) {
                 perror("mount failed");
+                display_error(p_display, p_framebuffer);
                 break;
             }
             printf("%s was mounted successfully.\n", partition);
 
             // Copy local log file to USB device
-            copy_log_file_to_usb();
-
-            // Copy configuration file from USB device locally
-            copy_config_file_from_usb();
+            if (!copy_log_file_to_usb())
+                display_error(p_display, p_framebuffer);
 
             // Unmount device
-            if (umount(USB_MOUNT_PATH) != 0) {
-                perror("umount failed");
-                break;
-            }
-            printf("%s was unmounted successfully.\n", partition);
+            if (umount(USB_MOUNT_PATH) != 0) perror("umount failed");
+            else printf("%s was unmounted successfully.\n", partition);
 
             display_ok(p_display, p_framebuffer);
             break;
@@ -201,7 +210,7 @@ bool init(void)
     return true;
 }
 
-void copy_log_file_to_usb()
+bool copy_log_file_to_usb()
 {
     // Build path string
     char path_to_log[30];
@@ -211,13 +220,13 @@ void copy_log_file_to_usb()
     FILE* log_file = fopen(path_to_log, "w");
     if (log_file == NULL) {
         perror("Can't open log file\n");
-        return;
+        return false;
     }
 
     FILE* local_log_file = fopen(LOG_FILE_PATH, "r");
     if (local_log_file == NULL) {
         perror("Can't open local log file\n");
-        return;
+        return false;
     }
 
     // Read local log file line by line and write it to the USB device
@@ -228,46 +237,6 @@ void copy_log_file_to_usb()
 
     fclose(local_log_file);
     fclose(log_file);
-}
 
-void copy_config_file_from_usb()
-{
-    conf_t conf;
-    bool ok;
-
-    // Build path string
-    char path_to_config[30];
-    strcpy(path_to_config, USB_MOUNT_PATH);
-    strcat(path_to_config, CONFIG_FILE_NAME);
-
-    if (access(path_to_config, F_OK) != 0) {
-        printf("No configuration file found in USB device.\n");
-        return;
-    }
-    printf("Configuration file found in USB device.\n");
-
-    // Retrieve configuration from USB device
-    ok = read_configuration(&conf, path_to_config);
-    if (!ok) {
-        printf("Error while reading configuration file from USB device.\n");
-        return;
-    }
-
-    // Write configuration locally
-    ok = write_configuration(&conf, CONFIG_FILE_PATH);
-    if (!ok) {
-        printf("Error while writing configuration file locally.\n");
-        return;
-    }
-
-    printf("Configuration file copied locally successfully.\n");
-
-    // Retrieve local configuration
-    ok = read_configuration(&configuration, CONFIG_FILE_PATH);
-    if (!ok) {
-        printf("Error while reading configuration file locally.\n");
-        return;
-    }
-
-    printf("Configuration updated.\n");
+    return true;
 }
