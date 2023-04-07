@@ -26,6 +26,7 @@
 #define DISPLAY_MAX_LINES 30
 #define DISPLAY_MAX_LINES_VISIBLE 3
 #define DISPLAY_MAX_STRING_LENGTH (DISPLAY_MAX_LINE_CHAR * DISPLAY_MAX_LINES_VISIBLE) + DISPLAY_MAX_LINES_VISIBLE // 3 lines + '\n'
+#define DISPLAY_TIME_S 3
 
 /* ------------------------------------------------------------------------- */
 /*                             Type definitions                              */
@@ -39,7 +40,13 @@ struct display_message {
     char lines[DISPLAY_MAX_LINES][DISPLAY_MAX_LINE_CHAR];
 };
 
+struct display_routine_arg {
+    ssd1306_i2c_t* p_display;
+    ssd1306_framebuffer_t* p_framebuffer;
+};
+
 typedef struct display_message display_message_t;
+typedef struct display_routine_arg display_routine_arg_t;
 
 /* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */
@@ -58,6 +65,8 @@ typedef struct display_message display_message_t;
 */
 void display_string(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, char string[DISPLAY_MAX_STRING_LENGTH], int x, int y, int font_size);
 
+void display_string_temporary(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, char string[DISPLAY_MAX_STRING_LENGTH], int x, int y, int font_size);
+
 /**
  * Display a multi-line message, 3 lines at a time.
  * @param p_display Pointer to the display
@@ -71,14 +80,26 @@ void display_message_array(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_fr
  * Display a cross to indicate an error.
  * @param p_display Pointer to the display
  * @param p_framebuffer Pointer to the framebuffer
+ * @param temporary If the message should be cleared after DISPLAY_TIME_S seconds
 */
-void display_error(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer);
+void display_error(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, bool temporary);
 
 /**
  * Display "OK" to indicate a success.
  * @param p_display Pointer to the display
  * @param p_framebuffer Pointer to the framebuffer
+ * @param temporary If the message should be cleared after DISPLAY_TIME_S seconds
 */
-void display_ok(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer);
+void display_ok(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, bool temporary);
+
+void display_clear(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer);
+
+/* ------------------------------------------------------------------------- */
+/*                    Thread routine function prototypes                     */
+/* ------------------------------------------------------------------------- */
+
+void* display_error_routine(void* arg);
+
+void* display_ok_routine(void* arg);
 
 #endif

@@ -36,6 +36,13 @@ void display_string(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuff
     sleep(1);
 }
 
+void display_string_temporary(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, char string[DISPLAY_MAX_STRING_LENGTH], int x, int y, int font_size)
+{
+    display_string(p_display, p_framebuffer, string, x, y, font_size);
+    sleep(DISPLAY_TIME_S);
+    display_clear(p_display, p_framebuffer);
+}
+
 void display_message_array(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, display_message_t msg, int nb_lines)
 {
     char string[DISPLAY_MAX_STRING_LENGTH];
@@ -57,18 +64,52 @@ void display_message_array(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_fr
     ssd1306_framebuffer_clear(p_framebuffer);
 }
 
-void display_error(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer)
+void display_error(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, bool temporary)
 {
     ssd1306_framebuffer_clear(p_framebuffer);
     ssd1306_framebuffer_draw_text(p_framebuffer, "X", sizeof(char) * strlen("X"), 46, 46, SSD1306_FONT_DEFAULT, 12, NULL);
     ssd1306_i2c_display_update(p_display, p_framebuffer);
     ssd1306_framebuffer_clear(p_framebuffer);
+
+    if (temporary) {
+        sleep(DISPLAY_TIME_S);
+        display_clear(p_display, p_framebuffer);
+    }
 }
 
-void display_ok(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer)
+void display_ok(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, bool temporary)
 {
     ssd1306_framebuffer_clear(p_framebuffer);
     ssd1306_framebuffer_draw_text(p_framebuffer, "OK", sizeof(char) * strlen("OK"), 32, 46, SSD1306_FONT_DEFAULT, 10, NULL);
     ssd1306_i2c_display_update(p_display, p_framebuffer);
     ssd1306_framebuffer_clear(p_framebuffer);
+
+    if (temporary) {
+        sleep(DISPLAY_TIME_S);
+        display_clear(p_display, p_framebuffer);
+    }
+}
+
+void display_clear(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer)
+{
+    ssd1306_framebuffer_clear(p_framebuffer);
+    ssd1306_i2c_display_update(p_display, p_framebuffer);
+}
+
+/* ------------------------------------------------------------------------- */
+/*                         Thread routine functions                          */
+/* ------------------------------------------------------------------------- */
+
+void* display_error_routine(void* arg)
+{
+    display_routine_arg_t* arg_struct = (display_routine_arg_t*)arg;
+    display_clear(arg_struct->p_display, arg_struct->p_framebuffer);
+    display_error(arg_struct->p_display, arg_struct->p_framebuffer, true);
+}
+
+void* display_ok_routine(void* arg)
+{
+    display_routine_arg_t* arg_struct = (display_routine_arg_t*)arg;
+    display_clear(arg_struct->p_display, arg_struct->p_framebuffer);
+    display_ok(arg_struct->p_display, arg_struct->p_framebuffer, true);
 }

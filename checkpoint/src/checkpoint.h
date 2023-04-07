@@ -15,15 +15,8 @@
 #include <stdbool.h>
 
 /* ------------------------------------------------------------------------- */
-/*                            Function prototypes                            */
+/*                    Thread routine function prototypes                     */
 /* ------------------------------------------------------------------------- */
-
-/**
- * Function for the display thread.
- * It is responsible for displaying informations on the screen.
- * @param arg Unused.
-*/
-void* display_routine(void* arg);
 
 /**
  * Function for the button thread.
@@ -52,6 +45,10 @@ void* send_data_routine(void* arg);
  * @param arg Unused.
 */
 void* usb_key_routine(void* arg);
+
+/* ------------------------------------------------------------------------- */
+/*                            Function prototypes                            */
+/* ------------------------------------------------------------------------- */
 
 /**
  * Initialization function. Prints error if they happen.

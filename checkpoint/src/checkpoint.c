@@ -22,9 +22,12 @@
 /*                             Global variables                              */
 /* ------------------------------------------------------------------------- */
 
+pthread_mutex_t mut_display = PTHREAD_MUTEX_INITIALIZER;
+
 // Variables to interact with the display
 ssd1306_i2c_t* p_display;
 ssd1306_framebuffer_t* p_framebuffer;
+display_routine_arg_t display_routine_arg;
 
 /* ------------------------------------------------------------------------- */
 /*                               Main function                               */
@@ -32,19 +35,17 @@ ssd1306_framebuffer_t* p_framebuffer;
 
 int main(int argc, char* argv[])
 {
-    pthread_t th_display, th_button, th_rfid, th_send_data, th_usb_key;
+    pthread_t th_button, th_rfid, th_send_data, th_usb_key;
 
     if (!init()) exit(EXIT_FAILURE);
 
     // Create threads
-    pthread_create(&th_display, NULL, display_routine, NULL);
     pthread_create(&th_button, NULL, button_routine, NULL);
     pthread_create(&th_rfid, NULL, rfid_routine, NULL);
     pthread_create(&th_send_data, NULL, send_data_routine, NULL);
     pthread_create(&th_usb_key, NULL, usb_key_routine, NULL);
 
     // Wait for threads to finish
-    pthread_join(th_display, NULL);
     pthread_join(th_button, NULL);
     pthread_join(th_rfid, NULL);
     pthread_join(th_send_data, NULL);
@@ -57,11 +58,6 @@ int main(int argc, char* argv[])
 /*                         Thread routine functions                          */
 /* ------------------------------------------------------------------------- */
 
-void* display_routine(void* arg)
-{
-    pthread_exit(NULL);
-}
-
 void* button_routine(void* arg)
 {
     pthread_exit(NULL);
@@ -70,11 +66,12 @@ void* button_routine(void* arg)
 void* rfid_routine(void* arg)
 {
     rfid_read_t rfid_read;
+    pthread_t th_display;
 
     while (1) {
         if (!wait_rfid_read(&rfid_read)) {
             printf("Problem when reading RFID card.\n");
-            display_error(p_display, p_framebuffer);
+            pthread_create(&th_display, NULL, display_error_routine, &display_routine_arg);
             continue;
         }
 
@@ -89,9 +86,9 @@ void* rfid_routine(void* arg)
         if (rfid_read.admin) {
             if (is_emergency_active()) {
                 bool created = create_emergency_solved_log();
-                created ? display_ok(p_display, p_framebuffer) : display_error(p_display, p_framebuffer);
+                pthread_create(&th_display, NULL, created ? display_ok_routine : display_error_routine, &display_routine_arg);
             }
-            else display_ok(p_display, p_framebuffer);
+            else pthread_create(&th_display, NULL, display_ok_routine, &display_routine_arg);
             continue;
         }
 
@@ -101,8 +98,12 @@ void* rfid_routine(void* arg)
         strcat(log_description, " ");
         strcat(log_description, rfid_read.last_name);
         bool created = create_log(rfid_read.code, log_description);
-        if (!created)
+        if (!created) {
             printf("Error when logging code:'%d' description:'%s'", rfid_read.code, log_description);
+            pthread_create(&th_display, NULL, display_error_routine, &display_routine_arg);
+            continue;
+        }
+        pthread_create(&th_display, NULL, display_ok_routine, &display_routine_arg);
 
         // Print the last participants passages
         // TODO
@@ -119,11 +120,12 @@ void* send_data_routine(void* arg)
 void* usb_key_routine(void* arg)
 {
     usb_event_t usb_event;
+    pthread_t th_display;
 
     while (1) {
         if (!wait_usb_event(&usb_event)) {
             printf("Problem with USB event.\n");
-            display_error(p_display, p_framebuffer);
+            pthread_create(&th_display, NULL, display_error_routine, &display_routine_arg);
             continue;
         }
 
@@ -138,20 +140,20 @@ void* usb_key_routine(void* arg)
             strcat(partition, "1");
             if (mount(partition, USB_MOUNT_PATH, "vfat", 0, NULL) != 0) {
                 perror("mount failed");
-                display_error(p_display, p_framebuffer);
+                pthread_create(&th_display, NULL, display_error_routine, &display_routine_arg);
                 break;
             }
             printf("%s was mounted successfully.\n", partition);
 
             // Copy local log file to USB device
             if (!copy_log_file_to_usb())
-                display_error(p_display, p_framebuffer);
+                pthread_create(&th_display, NULL, display_error_routine, &display_routine_arg);
 
             // Unmount device
             if (umount(USB_MOUNT_PATH) != 0) perror("umount failed");
             else printf("%s was unmounted successfully.\n", partition);
 
-            display_ok(p_display, p_framebuffer);
+            pthread_create(&th_display, NULL, display_ok_routine, &display_routine_arg);
             break;
         case USB_EVENT_DISCONNECT:
             printf("USB device disconnected: %s\n", usb_event.device);
@@ -206,6 +208,7 @@ bool init(void)
     }
     sleep(3);
     p_framebuffer = ssd1306_framebuffer_create(p_display->width, p_display->height, p_display->err);
+    display_routine_arg = (display_routine_arg_t){ p_display, p_framebuffer };
 
     return true;
 }
