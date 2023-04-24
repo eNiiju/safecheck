@@ -1,0 +1,13 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "files.associations": {
+            "stdlib.h": "c",
+            "kineis.h": "c"
+        }
+    }
+}
