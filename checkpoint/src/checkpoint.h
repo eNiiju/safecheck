@@ -1,64 +1,107 @@
 /**
- * Header of the main file for the checkpoint's program.
- * @file checkpoint.h
+ * Header for the file containing the functions to interact with the Kinéis module.
+ * @file kineis.h
  * @author Noé Maillet & Mathéo Mercier
+ * based on the code of Quentin Rosinki
  * @date 2023-02-07
  *
  */
 
-#include "display.h"
-#include "kineis.h"
-#include "log.h"
-#include "rfid.h"
-#include "usb_key.h"
+#ifndef KINEIS_H
+#define KINEIS_H
 
-#include <stdbool.h>
+#include <termios.h>
+#include <string.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <semaphore.h>
 
-/* ------------------------------------------------------------------------- */
-/*                    Thread routine function prototypes                     */
-/* ------------------------------------------------------------------------- */
+/*  Termios parameters / inits           */
+/*
+#define BUFFER_SIZE 50
+struct termios tio;
+struct termios stdio;
+struct termios old_stdio;
+int serial_tty, errno;
+*/
+/*  Semaphore parameters / inits         */
+/*
+#define SEM_FILENAME "termios.sem"
+#define SEM_FLAG O_CREAT
+#define SEM_RIGHTS 0666
+#define SEM_INIT_VALUE 0
+void * sem_termios_addr;
+
+/***************************** PROTOTYPES *****************************/
+/*
+void * my_init();
+int initSerialKineis();
+int closeSerialKineis();
+int readSerialKineis(char *buffer, void * sem_addr);
+int writeSerialKineis(int command, void * sem_addr);
+*/
+/*  EOF                                  */
+//code matheo
+/******************************* DEFINES ********************************/
+#define MAX_KINEIS_DATA_SIZE 50 //max size of the data sent to the kineis module
+#define MAX_SERIAL_READ_SIZE 100 //max size of the data read from the serial port
+#define TTY_PATH "/dev/ttyUSB0" //path of the serial port of kineis
+#define BAUDRATE B4800 //baudrate of the serial port
+#define POWER 1000 //power of transmission
+#define BAND B1//band of frequence use by the kineis module
+
+/***************************** PROTOTYPES *****************************/
+/**
+ * @brief Set the interface attributes for serial port
+ * inspired by https://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
+ * and Quentin Rosinki
+ * @param fd file descriptor of the serial port
+ * @param speed baudrate to be used
+ * @return 0 if success, -1 if error
+*/
+int set_interface_attribs (int fd, int speed);
 
 /**
- * Function for the button thread.
- * It is responsible for handling the button interrupts.
- * @param arg Unused.
+ * @brief Initialize the serial port of kineis for communication
+ * @return file descriptor which will be used as the serial port of kineis in other functions
+ * @return -1 if error
 */
-void* button_routine(void* arg);
+int kineis_init();
 
 /**
- * Function for the RFID thread.
- * It is responsible for handling the RFID interrupts.
- * @param arg Unused.
+ * @brief Close the serial port of kineis
+ * @param fd file descriptor of the serial port
 */
-void* rfid_routine(void* arg);
+void kineis_close(int fd);
 
 /**
- * Function for the send data thread.
- * It is responsible for sending data to the Kinéis satellites.
- * @param arg Unused.
+ * @brief Read data from the serial port of kineis read up to MAX_SERIAL_READ_SIZE bytes
+ * @param fd file descriptor of the serial port 
+ * @param response buffer to store the data read (if you need to)
+ * @return number of bytes read
 */
-void* send_data_routine(void* arg);
+int kineis_read_data(int fd, char* response);
 
 /**
- * Function for the USB key thread.
- * It is responsible for handling the USB key interactions.
- * @param arg Unused.
+ * @brief Send data to the serial port of kineis
+ * @param fd file descriptor of the serial port
+ * @param data data to be sent
+ * @param len length of the data to be sent (must be < MAX_KINEIS_DATA_SIZE)
 */
-void* usb_key_routine(void* arg);
-
-/* ------------------------------------------------------------------------- */
-/*                            Function prototypes                            */
-/* ------------------------------------------------------------------------- */
+void kineis_send_data(int fd, char *data, int len);
 
 /**
- * Initialization function. Prints error if they happen.
- * @return True if initialization was successful, false otherwise.
+ * @brief Set the power of transmission of the kineis module
+ * @param fd file descriptor of the serial port
+ * @param power power of transmission (between 0 and 2500)
 */
-bool init(void);
+void kineis_set_power(int fd, int power);
 
 /**
- * Copy the log file to the USB key.
- * Prints error if they happen.
- * @return True if copy was successful, false otherwise.
+ * @brief Set the band of frequence of the kineis module
+ * @param fd file descriptor of the serial port
+ * @param band band of frequence 
 */
-bool copy_log_file_to_usb();
+void kineis_set_band(int fd, int band);
+
+#endif //
