@@ -18,7 +18,7 @@
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
 
-#define SEND_DATA_PERIOD 120 // In seconds
+#define SEND_DATA_PERIOD_S 120 // In seconds
 
 /* ------------------------------------------------------------------------- */
 /*                    Thread routine function prototypes                     */

@@ -122,10 +122,10 @@ void* send_data_routine(void* arg)
     char data_to_send[MAX_KINEIS_DATA_SIZE];
 
     while (1) {
-        retrieve_data_to_send(&data_to_send, MAX_KINEIS_DATA_SIZE);
+        retrieve_data_to_send(data_to_send, MAX_KINEIS_DATA_SIZE);
         kineis_send_data(fd_kineis_port, data_to_send, strlen(data_to_send));
 
-        sleep(SEND_DATA_PERIOD);
+        sleep(SEND_DATA_PERIOD_S);
     }
 
     pthread_exit(NULL);
@@ -277,7 +277,8 @@ void retrieve_data_to_send(char* data_to_send, int max_size)
     // Test every participant code
     for (int i = 8; i < max_size * 8; i++) {
         int index = i / 8;
-        log_found = get_last_log_by_code(&log, i);
+        // Search for the last log of the participant, start counting at code = 1
+        log_found = get_last_log_by_code(&log, i - 8 + 1);
 
         if (log_found) {
             // If the participant has passed, their bit is set to 1
@@ -306,18 +307,4 @@ void retrieve_data_to_send(char* data_to_send, int max_size)
             }
         }
     }
-
-/*
-    for (int i = 1; i < max_size; i++) {
-        char octet_j = 0;
-        //1 byte stands for 8 runners
-        //ex : 1111111 = 255 = all 8runner of this bytes came through this checkpo
-        for (int j = 1; j <= 8; j++) {
-            log_found = get_last_log_by_code(&log, j);
-            if(log_found) octet_j += 1 * powf(2, j);
-        }
-
-        data_to_send[i] = octet_j;
-    }
-    */
 }
