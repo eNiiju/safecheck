@@ -7,7 +7,6 @@
  *
 */
 
-#include "kineis.h"
 #include <errno.h>
 #include <fcntl.h> 
 #include <stdio.h>
@@ -16,10 +15,14 @@
 #include <termios.h>
 #include <unistd.h>
 
+#include "kineis.h"
+
 /* ------------------------------------------------------------------------- */
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
-int set_interface_attribs (int fd, int speed){
+
+int set_interface_attribs(int fd, int speed)
+{
     struct termios tty;//struct termios to configure our COM port
 
     //we copy the actual conf of the COM port
@@ -27,8 +30,8 @@ int set_interface_attribs (int fd, int speed){
         printf("Error from tcgetattr: %s\n", strerror(errno));
         return -1;
     }
-    cfsetospeed(&tty,speed);
-    cfsetispeed(&tty,speed);
+    cfsetospeed(&tty, speed);
+    cfsetispeed(&tty, speed);
 
     /********control flags*********/
     tty.c_cflag &= ~CRTSCTS;//no flow control
@@ -48,7 +51,7 @@ int set_interface_attribs (int fd, int speed){
     /**********input flags**********/
     //we disable anything to juste get raw data on the port
     tty.c_iflag &= ~(IXON | IXOFF | IXANY); //disable software flow control
-    tty.c_iflag &= ~(IGNBRK|BRKINT|PARMRK|ISTRIP|INLCR|IGNCR|ICRNL); // Disable any special handling of received bytes
+    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL); // Disable any special handling of received bytes
 
     /**********output flags**********/
     tty.c_oflag &= ~OPOST; // Prevent special interpretation of output bytes (e.g. newline chars)
@@ -71,14 +74,15 @@ int set_interface_attribs (int fd, int speed){
     return 0;
 }
 
-int kineis_init(){
+int kineis_init()
+{
     int fd = open(TTY_PATH, O_RDWR | O_NOCTTY | O_SYNC);//open the COM port in read/write mode, fd is the descriptor of the port
 
-    if (fd < 0){
-        printf("error %d opening %s: %s", errno, TTY_PATH, strerror (errno));
+    if (fd < 0) {
+        printf("error %d opening %s: %s", errno, TTY_PATH, strerror(errno));
         return -1;
     }
-    set_interface_attribs (fd, BAUDRATE);  // set speed to 115,200 bps, 8n1 (no parity)
+    set_interface_attribs(fd, BAUDRATE);  // set speed to 115,200 bps, 8n1 (no parity)
     fcntl(fd, F_SETFL, O_NONBLOCK);//set non blocking read
     printf("Kineis module initialized\n");
     kineis_set_band(fd, BAND);
@@ -86,101 +90,71 @@ int kineis_init(){
     return fd;
 }
 
-void kineis_close(int fd){
+void kineis_close(int fd)
+{
     close(fd);
 }
 
-void kineis_send_data(int fd, char *data, int len) {
+void kineis_send_data(int fd, char* data, int len)
+{
     char write_buffer[MAX_KINEIS_DATA_SIZE];
 
-    if(len < MAX_KINEIS_DATA_SIZE && fd > 0) {
+    if (len < MAX_KINEIS_DATA_SIZE && fd > 0) {
         strcpy(write_buffer, "AT+TX=");
         strcat(write_buffer, data);
         strcat(write_buffer, "\r\n");
-        write(fd, &write_buffer,strlen(write_buffer));
+        write(fd, &write_buffer, strlen(write_buffer));
         sleep(10);//the data sometime long to transmit through Kineis
     }
 
 }
 
-void kineis_read_data(int fd, char* response){
+void kineis_read_data(int fd, char* response)
+{
     char read_buffer;
     char tmp[MAX_SERIAL_READ_SIZE];
-    int i=0;
+    int i = 0;
     sleep(1);
 
-    while(read(fd, &read_buffer, 1) > 0  && i < MAX_SERIAL_READ_SIZE){
+    while (read(fd, &read_buffer, 1) > 0 && i < MAX_SERIAL_READ_SIZE) {
         tmp[i] = read_buffer;
         i++;
     }
     tmp[i] = '\0';
 
-    usleep ((strlen(tmp) + 25) * 1000); // sleep enough to transmit the command
+    usleep((strlen(tmp) + 25) * 1000); // sleep enough to transmit the command
     strcpy(response, tmp);
     printf("Read %d bytes from kineis : %s\n", i, response);
 }
 
-void kineis_set_band(int fd, char* band) {
+void kineis_set_band(int fd, char* band)
+{
     char write_buffer[MAX_KINEIS_DATA_SIZE];
     char read_buffer[MAX_KINEIS_DATA_SIZE];
 
-    if(fd > 0) {
+    if (fd > 0) {
         strcpy(write_buffer, "AT+BAND=");
         strcat(write_buffer, band);
         strcat(write_buffer, "\r\n");
         printf("we send to kineis : %s\n", write_buffer);
         write(fd, &write_buffer, strlen(write_buffer));
-        usleep ((strlen(write_buffer) + 25) * 1000); // sleep enough to transmit the command
+        usleep((strlen(write_buffer) + 25) * 1000); // sleep enough to transmit the command
     }
 }
 
-void kineis_set_power(int fd, int power) {
+void kineis_set_power(int fd, int power)
+{
     char write_buffer[MAX_KINEIS_DATA_SIZE];
     char tmp[10];
     char read_buffer[MAX_KINEIS_DATA_SIZE];
 
-    if(fd > 0) {
+    if (fd > 0) {
         strcpy(write_buffer, "AT+PWR=");
         sprintf(tmp, "%d", power);//convert int to string
         strncat(write_buffer, tmp, 4);//to avoid \0 character
         strcat(write_buffer, "\r\n");
         printf("we send to kineis : %s\n", write_buffer);
         write(fd, &write_buffer, strlen(write_buffer));
-        usleep ((strlen(write_buffer) + 25) * 1000); // sleep enough to transmit the command
+        usleep((strlen(write_buffer) + 25) * 1000); // sleep enough to transmit the command
     }
 }
-
-/*
-int main(int argc, char *argv[]) {
-    int fd;//this will be our COM port descriptor
-    char data[MAX_KINEIS_DATA_SIZE];
-    char response[MAX_KINEIS_DATA_SIZE];
-    int res;
-
-    fd = kineis_init();
-
-    if(fd < 0) {
-        printf("Error opening serial port\n");
-        return -1;
-    }
-
-    kineis_set_band(fd, BAND);
-    kineis_read_data(fd, response);
-    kineis_set_power(fd, POWER);
-    kineis_read_data(fd, response);
-
-    if(fd < 0) {
-        printf("Error opening serial port\n");
-        return -1;
-    }
-
-    strcpy(data,"1111");
-    for(int i = 0; i < 10; i++){
-        kineis_send_data(fd, data, strlen(data));
-        kineis_read_data(fd, response);
-    }
-
-    kineis_close(fd);
-    return 0;
-}
-*/
