@@ -15,6 +15,12 @@
 #include <stdbool.h>
 
 /* ------------------------------------------------------------------------- */
+/*                          Constants & Definitions                          */
+/* ------------------------------------------------------------------------- */
+
+#define SEND_DATA_PERIOD 120 // In seconds
+
+/* ------------------------------------------------------------------------- */
 /*                    Thread routine function prototypes                     */
 /* ------------------------------------------------------------------------- */
 
@@ -62,3 +68,5 @@ bool init(void);
  * @return True if copy was successful, false otherwise.
 */
 bool copy_log_file_to_usb();
+
+void retrieve_data_to_send(char* data_to_send, int max_size);

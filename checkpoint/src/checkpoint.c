@@ -17,17 +17,22 @@
 #include <dirent.h>
 #include <sys/mount.h>
 #include <sys/stat.h>
+#include <math.h>
 
 /* ------------------------------------------------------------------------- */
 /*                             Global variables                              */
 /* ------------------------------------------------------------------------- */
 
-pthread_mutex_t mut_display = PTHREAD_MUTEX_INITIALIZER;
+// Mutexes
+pthread_mutex_t mut_display = PTHREAD_MUTEX_INITIALIZER; // Mutex for the display
 
 // Variables to interact with the display
-ssd1306_i2c_t* p_display;
-ssd1306_framebuffer_t* p_framebuffer;
-display_routine_arg_t display_routine_arg;
+ssd1306_i2c_t* p_display; // Display
+ssd1306_framebuffer_t* p_framebuffer; // Framebuffer for the display
+display_routine_arg_t display_routine_arg; // Argument for the display routine
+
+// Variables to interact with the Kinéis module
+int fd_kineis_port; // File descriptor for the Kinéis port
 
 /* ------------------------------------------------------------------------- */
 /*                               Main function                               */
@@ -114,6 +119,15 @@ void* rfid_routine(void* arg)
 
 void* send_data_routine(void* arg)
 {
+    char data_to_send[MAX_KINEIS_DATA_SIZE];
+
+    while (1) {
+        retrieve_data_to_send(&data_to_send, MAX_KINEIS_DATA_SIZE);
+        kineis_send_data(fd_kineis_port, data_to_send, strlen(data_to_send));
+
+        sleep(SEND_DATA_PERIOD);
+    }
+
     pthread_exit(NULL);
 }
 
@@ -210,6 +224,13 @@ bool init(void)
     p_framebuffer = ssd1306_framebuffer_create(p_display->width, p_display->height, p_display->err);
     display_routine_arg = (display_routine_arg_t){ p_display, p_framebuffer };
 
+    // Init Kinéis module
+    fd_kineis_port = kineis_init();
+    if (fd_kineis_port < 0) {
+        printf("Error: Could not initialize Kinéis COM port\n");
+        return false;
+    }
+
     return true;
 }
 
@@ -242,4 +263,61 @@ bool copy_log_file_to_usb()
     fclose(log_file);
 
     return true;
+}
+
+void retrieve_data_to_send(char* data_to_send, int max_size)
+{
+    log_t log;
+    bool log_found;
+
+    // First byte represents the emergency state
+    data_to_send[0] = is_emergency_active() ? 255 : 0;
+
+    // Other bytes represent the participants passages
+    // Test every participant code
+    for (int i = 8; i < max_size * 8; i++) {
+        int index = i / 8;
+        log_found = get_last_log_by_code(&log, i);
+
+        if (log_found) {
+            // If the participant has passed, their bit is set to 1
+            switch (i % 8) {
+            case 0: data_to_send[index] |= 0b00000001; break;
+            case 1: data_to_send[index] |= 0b00000010; break;
+            case 2: data_to_send[index] |= 0b00000100; break;
+            case 3: data_to_send[index] |= 0b00001000; break;
+            case 4: data_to_send[index] |= 0b00010000; break;
+            case 5: data_to_send[index] |= 0b00100000; break;
+            case 6: data_to_send[index] |= 0b01000000; break;
+            case 7: data_to_send[index] |= 0b10000000; break;
+            }
+        }
+        else {
+            // If the participant hasn't passed, their bit is set to 0
+            switch (i % 8) {
+            case 0: data_to_send[index] &= 0b11111110; break;
+            case 1: data_to_send[index] &= 0b11111101; break;
+            case 2: data_to_send[index] &= 0b11111011; break;
+            case 3: data_to_send[index] &= 0b11110111; break;
+            case 4: data_to_send[index] &= 0b11101111; break;
+            case 5: data_to_send[index] &= 0b11011111; break;
+            case 6: data_to_send[index] &= 0b10111111; break;
+            case 7: data_to_send[index] &= 0b01111111; break;
+            }
+        }
+    }
+
+/*
+    for (int i = 1; i < max_size; i++) {
+        char octet_j = 0;
+        //1 byte stands for 8 runners
+        //ex : 1111111 = 255 = all 8runner of this bytes came through this checkpo
+        for (int j = 1; j <= 8; j++) {
+            log_found = get_last_log_by_code(&log, j);
+            if(log_found) octet_j += 1 * powf(2, j);
+        }
+
+        data_to_send[i] = octet_j;
+    }
+    */
 }
