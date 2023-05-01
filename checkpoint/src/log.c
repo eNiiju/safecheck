@@ -109,3 +109,32 @@ bool is_emergency_active(void)
     fclose(log_file);
     return emergency_active;
 }
+
+bool get_last_log_by_code(log_t* log, int code)
+{
+    FILE* log_file = fopen(LOG_FILE_PATH, "r");
+    char line[MAX_LENGTH_LOG_LINE];
+    bool found = false;
+
+    if (log_file == NULL) return false;
+
+    while (fgets(line, sizeof(line), log_file) != NULL) {
+        // Split line to get the code
+        strtok(line, " ");
+        char* log_code = strtok(NULL, " \"");
+
+        // Update log if code matches
+        if (atoi(log_code) == code) {
+            char* timestamp = strtok(NULL, " \"");
+            char* description = strtok(NULL, "\"");
+
+            log->timestamp = atol(timestamp);
+            log->code = atoi(log_code);
+            strcpy(log->description, description);
+            found = true;
+        }
+    }
+
+    fclose(log_file);
+    return found;
+}

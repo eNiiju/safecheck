@@ -85,4 +85,6 @@ int count_logs(void);
 */
 bool is_emergency_active(void);
 
+bool get_last_log_by_code(log_t* log, int code);
+
 #endif
