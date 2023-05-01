@@ -2,6 +2,7 @@
  * File containing the functions to interact with the Kinéis module.
  * @file kineis.c
  * @author Noé Maillet & Mathéo Mercier
+ * based on the code of Quentin Rosinki
  * @date 2023-02-07
  *
 */
@@ -14,6 +15,7 @@
 #include <string.h>
 #include <termios.h>
 #include <unistd.h>
+
 /* ------------------------------------------------------------------------- */
 /*                                 Functions                                 */
 /* ------------------------------------------------------------------------- */
