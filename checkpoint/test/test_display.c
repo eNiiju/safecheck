@@ -1,3 +1,9 @@
+/**
+ @author Noe Maillet & Mathéo Mercier
+ @file test_display.c
+ * this file is made to test the functions of ../src/display.c
+*/
+
 #include "../src/display.h"
 
 int main(void){
@@ -23,7 +29,9 @@ int main(void){
     p_framebuffer=ssd1306_framebuffer_create(p_display->width, p_display->height, p_display->err);
     //**********************end init**************************//
 
-    //write_string_to_display(p_display, p_framebuffer, "Hello World!\npd AHAHaAHHAAAahahaaahahanoe\nmat BG", 4, 16, 4);
-    //write_tab_to_display_scroll(p_display, p_framebuffer, tab, 14);
+    write_string_to_display(p_display, p_framebuffer, "Hello World!\npd AHAHaAHHAAAahahaaahahanoe\nmat BG", 4, 16, 4);
+    write_tab_to_display_scroll(p_display, p_framebuffer, tab, 14);
     write_valid_to_display(p_display, p_framebuffer);
+    sleep(5);
+    write_error_to_display(p_display, p_framebuffer);
 }
