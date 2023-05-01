@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Check if root
 if [ "$EUID" -ne 0 ]; then
     printf "Please run this script as root.\n"
