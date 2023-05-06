@@ -18,7 +18,7 @@
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
 
-#define SEND_DATA_PERIOD_S 120 // In seconds
+#define SEND_DATA_PERIOD_S 30 // In seconds
 #define EMERGENCY_BUTTON_PIN 5 // Wiring pi notation pin number
 
 /* ------------------------------------------------------------------------- */

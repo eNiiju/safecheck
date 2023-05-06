@@ -6,7 +6,7 @@ CC=gcc
 CFLAGS=-Wall -Wextra -Wno-unused-parameter
 
 # Checkpoint main executable
-LDFLAGS=-lpthread -lbcm2835 -ludev
+LDFLAGS=-lpthread -lbcm2835 -ludev -lwiringPi
 CHECKPOINTOBJ=src/display.o src/kineis.o src/log.o src/rfid.o src/usb_key.o
 
 # RFID

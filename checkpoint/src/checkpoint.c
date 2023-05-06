@@ -18,7 +18,7 @@
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <math.h>
-#include "../lib/wiringPi/wiringPi.h"
+#include "../lib/WiringPi/wiringPi/wiringPi.h"
 
 /* ------------------------------------------------------------------------- */
 /*                             Global variables                              */
@@ -121,10 +121,12 @@ void* rfid_routine(void* arg)
 void* send_data_routine(void* arg)
 {
     char data_to_send[MAX_KINEIS_DATA_SIZE];
-
+    char read_buffer[MAX_KINEIS_DATA_SIZE];
     while (1) {
         retrieve_data_to_send(data_to_send, MAX_KINEIS_DATA_SIZE);
+        printf("Data to send: %s\n", data_to_send);
         kineis_send_data(fd_kineis_port, data_to_send, strlen(data_to_send));
+        kineis_read_data(fd_kineis_port, read_buffer);
 
         sleep(SEND_DATA_PERIOD_S);
     }
@@ -283,7 +285,7 @@ void retrieve_data_to_send(char* data_to_send, int max_size)
     // Other characters represent the participants passages
     // Test every participant code
     for (int i = 1; i <= max_size * participants_per_char; i += participants_per_char) {
-        int index = i / participants_per_char;
+        int index = (i / participants_per_char) + 1;
 
         // Search for the last log of the 4 next participants (start counting at code = 1)
         for (int j = 0; j < participants_per_char; j++)

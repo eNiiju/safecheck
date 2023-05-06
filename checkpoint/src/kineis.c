@@ -103,6 +103,7 @@ void kineis_send_data(int fd, char* data, int len)
         strcpy(write_buffer, "AT+TX=");
         strcat(write_buffer, data);
         strcat(write_buffer, "\r\n");
+        printf("we send to kineis : %s\n", write_buffer);
         write(fd, &write_buffer, strlen(write_buffer));
         sleep(10);//the data sometime long to transmit through Kineis
     }
