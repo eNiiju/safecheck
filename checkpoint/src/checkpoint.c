@@ -18,6 +18,7 @@
 #include <sys/mount.h>
 #include <sys/stat.h>
 #include <math.h>
+#include "../lib/wiringPi/wiringPi.h"
 
 /* ------------------------------------------------------------------------- */
 /*                             Global variables                              */
@@ -230,6 +231,11 @@ bool init(void)
         printf("Error: Could not initialize Kinéis COM port\n");
         return false;
     }
+
+    // Init emergency button interrupt
+    wiringPiSetup();
+    pinMode(EMERGENCY_BUTTON_PIN, INPUT);
+    wiringPiISR(EMERGENCY_BUTTON_PIN, INT_EDGE_FALLING, &create_emergency_log);
 
     return true;
 }
