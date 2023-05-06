@@ -267,44 +267,48 @@ bool copy_log_file_to_usb()
 
 void retrieve_data_to_send(char* data_to_send, int max_size)
 {
-    log_t log;
-    bool log_found;
+    const int participants_per_char = 4;
+    log_t log[participants_per_char];
+    bool passages[participants_per_char];
 
     // First byte represents the emergency state
-    data_to_send[0] = is_emergency_active() ? 255 : 0;
+    data_to_send[0] = is_emergency_active() ? 'f' : '0';
 
-    // Other bytes represent the participants passages
+    // Other characters represent the participants passages
     // Test every participant code
-    for (int i = 8; i < max_size * 8; i++) {
-        int index = i / 8;
-        // Search for the last log of the participant, start counting at code = 1
-        log_found = get_last_log_by_code(&log, i - 8 + 1);
+    for (int i = 1; i <= max_size * participants_per_char; i += participants_per_char) {
+        int index = i / participants_per_char;
 
-        if (log_found) {
-            // If the participant has passed, their bit is set to 1
-            switch (i % 8) {
-            case 0: data_to_send[index] |= 0b00000001; break;
-            case 1: data_to_send[index] |= 0b00000010; break;
-            case 2: data_to_send[index] |= 0b00000100; break;
-            case 3: data_to_send[index] |= 0b00001000; break;
-            case 4: data_to_send[index] |= 0b00010000; break;
-            case 5: data_to_send[index] |= 0b00100000; break;
-            case 6: data_to_send[index] |= 0b01000000; break;
-            case 7: data_to_send[index] |= 0b10000000; break;
-            }
-        }
-        else {
-            // If the participant hasn't passed, their bit is set to 0
-            switch (i % 8) {
-            case 0: data_to_send[index] &= 0b11111110; break;
-            case 1: data_to_send[index] &= 0b11111101; break;
-            case 2: data_to_send[index] &= 0b11111011; break;
-            case 3: data_to_send[index] &= 0b11110111; break;
-            case 4: data_to_send[index] &= 0b11101111; break;
-            case 5: data_to_send[index] &= 0b11011111; break;
-            case 6: data_to_send[index] &= 0b10111111; break;
-            case 7: data_to_send[index] &= 0b01111111; break;
-            }
+        // Search for the last log of the 4 next participants (start counting at code = 1)
+        for (int j = 0; j < participants_per_char; j++)
+            passages[j] = get_last_log_by_code(&log[j], i + j);
+
+        // Number representing the 4 participant passage states (e.g. 1001 means
+        // the first and last did pass the checkpoint)
+        int number_representation = 0;
+        number_representation = passages[0] ? number_representation + 1000 : number_representation;
+        number_representation = passages[1] ? number_representation + 100 : number_representation;
+        number_representation = passages[2] ? number_representation + 10 : number_representation;
+        number_representation = passages[3] ? number_representation + 1 : number_representation;
+
+        // Add character (0-F) depending on the 4 parcitipant passage sates
+        switch (number_representation) {
+        case    0: data_to_send[index] = '0'; break;
+        case    1: data_to_send[index] = '1'; break;
+        case   10: data_to_send[index] = '2'; break;
+        case   11: data_to_send[index] = '3'; break;
+        case  100: data_to_send[index] = '4'; break;
+        case  101: data_to_send[index] = '5'; break;
+        case  110: data_to_send[index] = '6'; break;
+        case  111: data_to_send[index] = '7'; break;
+        case 1000: data_to_send[index] = '8'; break;
+        case 1001: data_to_send[index] = '9'; break;
+        case 1010: data_to_send[index] = 'A'; break;
+        case 1011: data_to_send[index] = 'B'; break;
+        case 1100: data_to_send[index] = 'C'; break;
+        case 1101: data_to_send[index] = 'D'; break;
+        case 1110: data_to_send[index] = 'E'; break;
+        case 1111: data_to_send[index] = 'F'; break;
         }
     }
 }
