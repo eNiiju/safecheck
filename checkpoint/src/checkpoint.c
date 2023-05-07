@@ -66,6 +66,19 @@ int main(int argc, char* argv[])
 
 void* button_routine(void* arg)
 {
+    int prev_state = 1;
+
+    while(1){
+        if(digitalRead(EMERGENCY_BUTTON_PIN) == LOW){
+            prev_state = 0;
+        }
+        if(digitalRead(EMERGENCY_BUTTON_PIN) == HIGH && prev_state == 0){
+            prev_state = 1;
+            create_emergency_log();
+            display_string_temporary(p_display, p_framebuffer, "Emergency OK", 4, 16, 4);
+            printf("emergency activated\n");
+        }
+    }
     pthread_exit(NULL);
 }
 
@@ -237,7 +250,6 @@ bool init(void)
     // Init emergency button interrupt
     wiringPiSetup();
     pinMode(EMERGENCY_BUTTON_PIN, INPUT);
-    wiringPiISR(EMERGENCY_BUTTON_PIN, INT_EDGE_FALLING, &create_emergency_log);
 
     return true;
 }
@@ -280,11 +292,11 @@ void retrieve_data_to_send(char* data_to_send, int max_size)
     bool passages[participants_per_char];
 
     // First byte represents the emergency state
-    data_to_send[0] = is_emergency_active() ? 'f' : '0';
+    data_to_send[0] = is_emergency_active() ? 'F' : '0';
 
     // Other characters represent the participants passages
     // Test every participant code
-    for (int i = 1; i <= max_size * participants_per_char; i += participants_per_char) {
+    for (int i = 1; i <= (max_size -8)* participants_per_char; i += participants_per_char) {
         int index = (i / participants_per_char) + 1;
 
         // Search for the last log of the 4 next participants (start counting at code = 1)

@@ -5,6 +5,8 @@
 */
 
 #include "../src/kineis.h"
+#include <string.h>
+#include <stdio.h>
 
 int main(int argc, char* argv[])
 {
@@ -30,7 +32,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    strcpy(data, "1111");
+    strcpy(data, "F00100000000000000000000000000000000000");
     for (int i = 0; i < 10; i++) {
         kineis_send_data(fd, data, strlen(data));
         kineis_read_data(fd, response);

@@ -13,7 +13,7 @@
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
 
-#define MAX_KINEIS_DATA_SIZE 45 // max size of the data sent to the kineis module
+#define MAX_KINEIS_DATA_SIZE 68 // max size of the data sent to the kineis module
 #define MAX_SERIAL_READ_SIZE 100 // max size of the data read from the serial port
 #define TTY_PATH "/dev/ttyUSB0" // path of the serial port of kineis
 #define BAUDRATE B4800 // baudrate of the serial port

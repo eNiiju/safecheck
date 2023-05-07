@@ -18,19 +18,12 @@
 /*                          Constants & Definitions                          */
 /* ------------------------------------------------------------------------- */
 
-#define SEND_DATA_PERIOD_S 30 // In seconds
+#define SEND_DATA_PERIOD_S 60 // In seconds
 #define EMERGENCY_BUTTON_PIN 5 // Wiring pi notation pin number
 
 /* ------------------------------------------------------------------------- */
 /*                    Thread routine function prototypes                     */
 /* ------------------------------------------------------------------------- */
-
-/**
- * Function for the button thread.
- * It is responsible for handling the button interrupts.
- * @param arg Unused.
-*/
-void* button_routine(void* arg);
 
 /**
  * Function for the RFID thread.
@@ -52,6 +45,14 @@ void* send_data_routine(void* arg);
  * @param arg Unused.
 */
 void* usb_key_routine(void* arg);
+
+/**
+ * @brief waits for someone to click the emergency button
+ *  puts a log of this event, print on the screen that emergency is indeed
+ *  activated
+ * @param arg unused
+*/
+void* button_routine(void* arg);
 
 /* ------------------------------------------------------------------------- */
 /*                            Function prototypes                            */
