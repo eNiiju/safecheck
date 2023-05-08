@@ -122,7 +122,7 @@ void kineis_read_data(int fd, char* response)
     }
     tmp[i] = '\0';
 
-    usleep((strlen(tmp) + 25) * 1000); // sleep enough to transmit the command
+    usleep((strlen(tmp) + 25) * 1000); // sleep enough to free the port
     strcpy(response, tmp);
     printf("Read %d bytes from kineis : %s\n", i, response);
 }
