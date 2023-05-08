@@ -2,7 +2,7 @@
  * File containing the functions to interact with the Kinéis module.
  * @file kineis.c
  * @author Noé Maillet & Mathéo Mercier
- * based on the code of Quentin Rosinki
+ * inspire by https://blog.mbedded.ninja/programming/operating-systems/linux/linux-serial-ports-using-c-cpp/
  * @date 2023-02-07
  *
 */
