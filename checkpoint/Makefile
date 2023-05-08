@@ -55,6 +55,9 @@ test/test_kineis: test/test_kineis.c src/kineis.o
 test/test_rfid: test/test_rfid.c src/rfid.h lib/rc522
 	$(CC) $(CFLAGS) -c $^ -o $@ -lbcm2835
 
+test/test_button: test/test_button.c
+	$(CC) $(CFLAGS) -c $^ -o $@ -lwiringPi
+
 # --------------------------------------------------------------------------- #
 #                                  Libraries                                  #
 # --------------------------------------------------------------------------- #
