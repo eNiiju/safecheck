@@ -52,6 +52,9 @@ test/test_display: test/test_display.c src/display.o
 test/test_kineis: test/test_kineis.c src/kineis.o
 	$(CC) $(CFLAGS) -c $^ -o $@
 
+test/test_rfid: test/test_rfid.c src/rfid.h lib/rc522
+	$(CC) $(CFLAGS) -c $^ -o $@ -lbcm2835
+
 # --------------------------------------------------------------------------- #
 #                                  Libraries                                  #
 # --------------------------------------------------------------------------- #

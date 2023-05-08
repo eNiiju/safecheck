@@ -1,6 +1,6 @@
 /**
- @author Noe Maillet & Mathéo Mercier
- @file test_display.c
+ * @author Noe Maillet & Mathéo Mercier
+ * @file test_display.c
  * This file is made to test the functions of display.c
 */
 

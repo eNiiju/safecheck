@@ -8,3 +8,4 @@ src/*.o
 # Test
 test/test_display
 test/test_kineis
+test/test_rfid

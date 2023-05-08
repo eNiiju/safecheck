@@ -1,16 +1,17 @@
 /**
- @author Noe Maillet & Mathéo Mercier
- @file test_kineis.c
+ * @author Noe Maillet & Mathéo Mercier
+ * @file test_kineis.c
  * This file is made to test the functions of kineis.c
 */
 
 #include "../src/kineis.h"
+
 #include <string.h>
 #include <stdio.h>
 
 int main(int argc, char* argv[])
 {
-    int fd; //this will be our COM port descriptor
+    int fd; // This will be our COM port descriptor
     char data[MAX_KINEIS_DATA_SIZE];
     char response[MAX_KINEIS_DATA_SIZE];
     int res;
