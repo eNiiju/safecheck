@@ -64,24 +64,6 @@ int main(int argc, char* argv[])
 /*                         Thread routine functions                          */
 /* ------------------------------------------------------------------------- */
 
-void* button_routine(void* arg)
-{
-    int prev_state = 1;
-
-    while(1){
-        if(digitalRead(EMERGENCY_BUTTON_PIN) == LOW){
-            prev_state = 0;
-        }
-        if(digitalRead(EMERGENCY_BUTTON_PIN) == HIGH && prev_state == 0){
-            prev_state = 1;
-            create_emergency_log();
-            display_string_temporary(p_display, p_framebuffer, "Emergency OK", 4, 16, 4);
-            printf("emergency activated\n");
-        }
-    }
-    pthread_exit(NULL);
-}
-
 void* rfid_routine(void* arg)
 {
     rfid_read_t rfid_read;
@@ -135,9 +117,10 @@ void* send_data_routine(void* arg)
 {
     char data_to_send[MAX_KINEIS_DATA_SIZE];
     char read_buffer[MAX_KINEIS_DATA_SIZE];
+
     while (1) {
         retrieve_data_to_send(data_to_send, MAX_KINEIS_DATA_SIZE);
-        printf("Data to send: %s\n", data_to_send);
+        printf("Data will be sent: %s\n", data_to_send);
         kineis_send_data(fd_kineis_port, data_to_send, strlen(data_to_send));
         kineis_read_data(fd_kineis_port, read_buffer);
 
@@ -191,6 +174,24 @@ void* usb_key_routine(void* arg)
         }
     }
 
+    pthread_exit(NULL);
+}
+
+void* button_routine(void* arg)
+{
+    int prev_state = 1;
+
+    while (1) {
+        if (digitalRead(EMERGENCY_BUTTON_PIN) == LOW) {
+            prev_state = 0;
+        }
+        if (digitalRead(EMERGENCY_BUTTON_PIN) == HIGH && prev_state == 0) {
+            prev_state = 1;
+            create_emergency_log();
+            display_string_temporary(p_display, p_framebuffer, "Emergency OK", 4, 16, 4);
+            printf("Emergency activated\n");
+        }
+    }
     pthread_exit(NULL);
 }
 
@@ -296,7 +297,7 @@ void retrieve_data_to_send(char* data_to_send, int max_size)
 
     // Other characters represent the participants passages
     // Test every participant code
-    for (int i = 1; i <= (max_size -8)* participants_per_char; i += participants_per_char) {
+    for (int i = 1; i <= (max_size - 8) * participants_per_char; i += participants_per_char) {
         int index = (i / participants_per_char) + 1;
 
         // Search for the last log of the 4 next participants (start counting at code = 1)

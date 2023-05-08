@@ -47,10 +47,10 @@ void* send_data_routine(void* arg);
 void* usb_key_routine(void* arg);
 
 /**
- * @brief waits for someone to click the emergency button
- *  puts a log of this event, print on the screen that emergency is indeed
- *  activated
- * @param arg unused
+ * Waits for someone to click the emergency button
+ * puts a log of this event, print on the screen that emergency is
+ * indeed activated
+ * @param arg Unused.
 */
 void* button_routine(void* arg);
 
@@ -71,4 +71,10 @@ bool init(void);
 */
 bool copy_log_file_to_usb();
 
+/**
+ * Retrieve the data to send to the Kinéis satellites from
+ * the log file.
+ * @param data_to_send The buffer to put the data in
+ * @param max_size The maximum size of the buffer
+*/
 void retrieve_data_to_send(char* data_to_send, int max_size);

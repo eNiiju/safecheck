@@ -65,6 +65,15 @@ typedef struct display_routine_arg display_routine_arg_t;
 */
 void display_string(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, char string[DISPLAY_MAX_STRING_LENGTH], int x, int y, int font_size);
 
+/**
+ * Displays a string and clears it after DISPLAY_TIME_S seconds.
+ * @param p_display Pointer to the display
+ * @param p_framebuffer Pointer to the framebuffer
+ * @param string String to write
+ * @param x X starting position of the string
+ * @param y Y starting position of the string
+ * @param font_size Font size
+*/
 void display_string_temporary(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, char string[DISPLAY_MAX_STRING_LENGTH], int x, int y, int font_size);
 
 /**
@@ -92,14 +101,27 @@ void display_error(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffe
 */
 void display_ok(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer, bool temporary);
 
+/**
+ * Clears the display.
+ * @param p_display Pointer to the display
+ * @param p_framebuffer Pointer to the framebuffer
+*/
 void display_clear(ssd1306_i2c_t* p_display, ssd1306_framebuffer_t* p_framebuffer);
 
 /* ------------------------------------------------------------------------- */
 /*                    Thread routine function prototypes                     */
 /* ------------------------------------------------------------------------- */
 
+/**
+ * Thread routine to display an error temporarily.
+ * @param arg Pointer to the display_routine_arg_t struct
+*/
 void* display_error_routine(void* arg);
 
+/**
+ * Thread routine to display a success temporarily.
+ * @param arg Pointer to the display_routine_arg_t struct
+*/
 void* display_ok_routine(void* arg);
 
 #endif

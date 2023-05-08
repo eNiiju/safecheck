@@ -107,7 +107,6 @@ void kineis_send_data(int fd, char* data, int len)
         write(fd, &write_buffer, strlen(write_buffer));
         sleep(10);//the data sometime long to transmit through Kineis
     }
-
 }
 
 void kineis_read_data(int fd, char* response)

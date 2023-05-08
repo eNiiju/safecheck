@@ -85,6 +85,12 @@ int count_logs(void);
 */
 bool is_emergency_active(void);
 
+/**
+ * Returns the last log entry with the provided code.
+ * @param log Pointer to the log struct to fill.
+ * @param code The code of the log entry to find.
+ * @return True if a log entry was found, false otherwis
+*/
 bool get_last_log_by_code(log_t* log, int code);
 
 #endif
