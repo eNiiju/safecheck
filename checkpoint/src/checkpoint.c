@@ -248,7 +248,7 @@ bool init(void)
         return false;
     }
 
-    // Init emergency button interrupt
+    // Init emergency button and wiringPi
     wiringPiSetup();
     pinMode(EMERGENCY_BUTTON_PIN, INPUT);
 
