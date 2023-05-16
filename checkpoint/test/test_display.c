@@ -11,6 +11,8 @@
 ssd1306_i2c_t* p_display;
 ssd1306_framebuffer_t* p_framebuffer;
 
+void init_display();
+
 int main(void)
 {
     struct display_message message = {
