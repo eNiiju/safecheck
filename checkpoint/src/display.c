@@ -7,6 +7,7 @@
  */
 
 #include <string.h>
+#include <pthread.h>
 
 #include "display.h"
 
@@ -105,6 +106,8 @@ void* display_error_routine(void* arg)
     display_routine_arg_t* arg_struct = (display_routine_arg_t*)arg;
     display_clear(arg_struct->p_display, arg_struct->p_framebuffer);
     display_error(arg_struct->p_display, arg_struct->p_framebuffer, true);
+
+    pthread_exit(NULL);
 }
 
 void* display_ok_routine(void* arg)
@@ -112,4 +115,6 @@ void* display_ok_routine(void* arg)
     display_routine_arg_t* arg_struct = (display_routine_arg_t*)arg;
     display_clear(arg_struct->p_display, arg_struct->p_framebuffer);
     display_ok(arg_struct->p_display, arg_struct->p_framebuffer, true);
+
+    pthread_exit(NULL);
 }
