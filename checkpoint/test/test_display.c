@@ -53,4 +53,6 @@ bool init_display()
     }
     sleep(3);
     p_framebuffer = ssd1306_framebuffer_create(p_display->width, p_display->height, p_display->err);
+    
+    return true;
 }
