@@ -11,7 +11,7 @@
 ssd1306_i2c_t* p_display;
 ssd1306_framebuffer_t* p_framebuffer;
 
-void init_display();
+bool init_display();
 
 int main(void)
 {
@@ -20,7 +20,7 @@ int main(void)
         .lines = { "jean", "jacques", "goldman", "anyway", "jsplus", "aled", "j'ai", "pas", "de", "phrase", "drole", "a", "ecrir" }
     };
 
-    init_display();
+    if (!init_display()) return -1;
 
     display_string(p_display, p_framebuffer, "Hello World!\nAHAHaAHHAAAahahaaahahanoe\nmat BG", 4, 16, 4);
     sleep(5);
@@ -39,7 +39,7 @@ int main(void)
     return 0;
 }
 
-void init_display()
+bool init_display()
 {
     p_display = ssd1306_i2c_open(DISPLAY_I2C_BUS_ADDRESS, DISPLAY_I2C_DEVICE_ADDRESS, DISPLAY_WIDTH, DISPLAY_HEIGHT, NULL);
     if (!p_display) {
