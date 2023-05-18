@@ -23,3 +23,10 @@ rm -rf bcm2835-1.56 bcm2835-1.56.tar.gz
 
 # Copy RC522 conf in /etc
 sudo cp ./lib/rc522/RC522.conf /etc/
+
+# Install WiringPi
+cd lib/
+git clone https://github.com/WiringPi/WiringPi
+cd WiringPi
+./build
+cd ../..

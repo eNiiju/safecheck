@@ -1,5 +1,6 @@
 # Lib
 lib/*/*.o
+lib/WiringPi
 
 # Src
 checkpoint
