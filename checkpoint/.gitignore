@@ -10,3 +10,4 @@ src/*.o
 test/test_display
 test/test_kineis
 test/test_rfid
+test/test_button

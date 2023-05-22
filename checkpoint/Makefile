@@ -46,13 +46,13 @@ src/usb_key.o: src/usb_key.c src/usb_key.h
 #                                    Tests                                    #
 # --------------------------------------------------------------------------- #
 
-test/test_display: test/test_display.c src/display.o
-	$(CC) $(CFLAGS) $^ -o $@ -L./lib/libssd1306/lib -l:libssd1306_i2c.so.0.0.3
+test/test_display: test/test_display.c src/display.o src/display.h
+	$(CC) $(CFLAGS) $^ -o $@ -L./lib/libssd1306/lib -l:libssd1306_i2c.so.0.0.3 -Wl,-rpath=./lib/libssd1306/lib
 
-test/test_kineis: test/test_kineis.c src/kineis.o
+test/test_kineis: src/kineis.o test/test_kineis.c 
 	$(CC) $(CFLAGS) $^ -o $@
 
-test/test_rfid: test/test_rfid.c src/rfid.h lib/rc522
+test/test_rfid: test/test_rfid.c src/rfid.h $(LIBRC522OBJ)
 	$(CC) $(CFLAGS) $^ -o $@ -lbcm2835
 
 test/test_button: test/test_button.c
